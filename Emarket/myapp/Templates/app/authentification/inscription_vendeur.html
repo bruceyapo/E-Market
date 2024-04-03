@@ -1,0 +1,79 @@
+
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %} authentification {% endblock title %}
+
+{% block main-content %}
+<div class="wrapper vh-100">
+    <div class="row align-items-center h-100">
+      <form method="post" class="col-lg-6 col-md-8 col-10 mx-auto shadow bg-white p-4 rounded" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if messages %}
+            {% for msg in messages %}
+                <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
+            {% endfor %}
+        {% endif %}
+        <div class="mx-auto text-center my-4">
+          <h2 class="my-3">Inscription vendeur</h2>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+              <div>
+                {{ form.nom.label_tag }}
+                {{ form.nom }}
+              </div>
+          <br>
+            <div>
+                {{ form.prenoms.label_tag }}
+                {{ form.prenoms }}
+            </div>
+          <br>
+            <div>
+                {{ form.ville.label_tag }}
+                {{ form.ville }}
+            </div>
+          <br>
+            <div>
+              {{ form.image.label_tag }}
+              {{ form.image }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div>
+              {{ form.telephone.label_tag }}
+              {{ form.telephone }}
+            </div>
+            <br>
+            <div>
+                {{ form.email.label_tag }}
+                {{ form.email }}
+            </div>
+            <br>
+            <div>
+                {{ form.password.label_tag }}
+                {{ form.password }}
+            </div>
+            <br>
+            <div>
+                {{ form.confirm_password.label_tag }}
+                {{ form.confirm_password }}
+            </div>
+          </div>
+        </div>
+        <br>
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Enregistrer</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    // Attendre 7 secondes avant de masquer le message
+    setTimeout(function() {
+        var alertMessage = document.getElementById('alert-message');
+        if (alertMessage) {
+            alertMessage.style.display = 'none';
+        }
+    }, 5000); // 7000 millisecondes = 7 secondes
+</script>
+{% endblock main-content %}
+
+

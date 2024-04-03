@@ -1,0 +1,30 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %} Modification Stock {% endblock title %}
+
+{% block main-content %}
+<div class="row align-items-center h-100">
+    
+    <form method="post" class="col-lg-6 col-md-4 col-10 mx-auto text-center shadow bg-white px-5 py-3 rounded">
+        {% csrf_token %}
+        <div id="form-container">
+            <div class="form-group" id="form-0">
+                {{ form.produit_0.label_tag }} {{ form.produit_0 }} 
+                {{ form.quantite_0.label_tag }} {{ form.quantite_0 }}
+            </div>
+        </div>
+        <button type="button" onclick="addForm()">Ajouter un produit</button>
+        <button type="submit">Mettre à jour le stock</button>
+    </form>
+</div>
+<script>
+    let formIdx = 1; // Pour distinguer les formulaires ajoutés dynamiquement
+    function addForm() {
+        const originalForm = document.getElementById('form-0').innerHTML;
+        const newForm = originalForm.replace(/produit_0/g, 'produit_' + formIdx).replace(/quantite_0/g, 'quantite_' + formIdx);
+        document.getElementById('form-container').insertAdjacentHTML('beforeend', '<div class="form-group" id="form-' + formIdx + '">' + newForm + '</div>');
+        formIdx++;
+    }
+</script>
+
+{% endblock main-content %}
