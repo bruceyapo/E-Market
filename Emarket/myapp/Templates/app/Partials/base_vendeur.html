@@ -9,6 +9,7 @@
     <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
     <link rel="stylesheet" href="{% static 'app/css/simplebar.css' %}">
     <link rel="stylesheet" href="{% static  'app/css/feather.css' %}">
+    <link rel="stylesheet" href="{% static  'app/css/fullcalendar.css' %}">
     <link rel="stylesheet" href="{% static  'app/css/select2.css' %}">
     <link rel="stylesheet" href="{% static  'app/css/dropzone.css' %}">
     <link rel="stylesheet" href="{% static  'app/css/uppy.min.css' %}">
@@ -26,7 +27,7 @@
 <body class="vertical  light">
     <div class="wrapper">
         
-    {% include 'app/nav_dash.html' %}
+    {% include 'app/Partials/nav_dash_vendeur.html' %}
     
         {% block main-content %}
     
@@ -41,9 +42,12 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script> -->
     <script src="{% static 'app/js/simplebar.min.js' %}"></script>
+    <script src="{% static 'app/js/daterangepicker.js' %}"></script>
     <script src="{% static 'app/js/jquery.stickOnScroll.js' %}"></script>
     <script src="{% static 'app/js/tinycolor-min.js' %}"></script>
     <script src="{% static 'app/js/config.js' %}"></script>
+    <script src="{% static 'app/js/fullcalendar.js' %}"></script>
+    <script src="{% static 'app/js/fullcalendar.custom.js' %}"></script>
     <script src="{% static 'app/js/d3.min.js' %}"></script>
     <script src="{% static 'app/js/topojson.min.js' %}"></script>
     <script src="{% static 'app/js/datamaps.all.min.js' %}"></script>

@@ -1,0 +1,89 @@
+
+{% extends "app/Partials/base_vendeur.html" %}
+{% load static %}
+{% block title %} Reçu de Vente {% endblock title %}
+
+{% block main-content %}
+<div class="col align-items-center  h-100 " style="width: 70%; margin-left: 210px;">
+    <div class="col-lg-12 col-md-12 col-12 mx-auto shadow bg-white px-5 py-3 rounded print-content">
+        <h1>Informations du reçu N° {{ recu.id }}</h1>
+        <strong>
+            Date de création: <span style="font-size: 2em;"> {{ recu.DateCreation }}</span>
+        </strong>
+
+        <h3>Détails des Ventes:</h3>
+        <table class="table border table-hover bg-white">
+            <thead>
+              <tr role="row">
+
+                <th>Client</th>
+                <th>Produit</th>
+                <th>Catégorie</th>
+                <th>Quantité</th>
+                <th>Prix unitaire</th>
+                <th>Montant</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for vente in ventes %}
+                  <tr>
+                    <td>{{ vente.IdClient.nom }} {{ vente.IdClient.prenoms }}</td>
+                    <td>{{ vente.IdProduit }}</td>
+                    <td>{{ vente.IdProduit.IdCategorie.nom }}</td>
+                    <td>{{ vente.QuantiteVendu }}</td>
+                    <td>{{ vente.IdProduit.PrixUnitaire }} FCFA</td>
+                    <td>{{ vente.MontantTotal }} FCFA</td>
+                    <td>{{ vente.DateVente }}</td>
+                    
+                  </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="4"><h3>Total</h3></td>
+                    <td colspan="2"><h3>{{ total_vente }} FCFA</h3></td>
+                </tr>
+                
+              
+              
+            </tbody>
+          </table>
+        
+    </div>
+    <div class="col-lg-12 col-md-12 col-12 mx-auto text-center shadow bg-white px-5 py-3 rounded print-hidden">
+
+        <div class="row">
+            <div class="col-md-6">
+                <a href="{% url 'list_recu' %}" class="btn btn-secondary">Retour</a>
+            </div>
+            <div class="col-md-6">
+                <button onclick="window.print()" class="btn btn-info btn-end">Imprimer</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        .print-hidden {
+            display: none;
+        }
+    }
+
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .print-content, .print-content * {
+            visibility: visible;
+        }
+        .print-content {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+    }
+</style>
+
+{% endblock main-content %}
+

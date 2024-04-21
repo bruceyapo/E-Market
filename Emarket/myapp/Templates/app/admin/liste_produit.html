@@ -1,30 +1,51 @@
-{% extends "app/base.html" %}
+{% extends "app/Partials/base_admin.html" %}
 {% load static %}
-{% block title %} Stock {% endblock title %}
+{% block title %} Liste Produit {% endblock title %}
 
 {% block main-content %}
 <main role="main" class="main-content">
     <div class="container-fluid">
       <div class="row justify-content-center">
         <div class="col-12">
-          <h2 class="h3 mb-3 page-title">Stock</h2>
+          <h2 class="h3 mb-3 page-title">Produit</h2>
             
           <div class="row mb-4 items-align-center">
+            <div class="col-md">
+              <ul class="nav nav-pills justify-content-start">
+                <li class="nav-item">
+                  <a class="nav-link active bg-transparent pr-2 pl-0 text-primary" href="#">Tout <span class="badge badge-pill bg-primary text-white ml-2">{{nombre_total_produit}}</span></a>
+                </li>
+                <!-- <li class="nav-item">
+                  <a class="nav-link text-muted px-2" href="#">Pending <span class="badge badge-pill bg-white border text-muted ml-2">64</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-muted px-2" href="#">Processing <span class="badge badge-pill bg-white border text-muted ml-2">48</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-muted px-2" href="#">Completed <span class="badge badge-pill bg-white border text-muted ml-2">52</span></a>
+                </li> -->
+              </ul>
+            </div>
             <div class="col-md-auto ml-auto text-right">
-                <span class="small py-1 px-2 mr-2 d-lg-inline">
-                    <a href="{% url 'modif_stock' %}" class="btn btn-success">Mettre à jour le stock</a>
-                  </span>
+              <span class="small py-1 px-2 mr-2 d-none d-lg-inline">
+                <a href="{% url 'AjoutCategoriet' %}" class="btn btn-info">Créer une nouvelle Catégorie</a>
+              </span>
+              <span class="small py-1 px-2 mr-2 d-none d-lg-inline">
+                <a href="{% url 'AjoutProduit' %}" class="btn btn-success">Ajouter un Produit</a>
+              </span>
               <button type="button" class="btn" data-toggle="modal" data-target=".modal-slide"><span class="fe fe-filter fe-16 text-muted"></span></button>
               <button type="button" class="btn"><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
             </div>
             
           </div>
-          {% if messages %}
-          {% for msg in messages %}
-              <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
-          {% endfor %}
-        {% endif %}
-          
+          <div class="m-auto" style="width: 50%;">
+            {% if messages %}
+            {% for msg in messages %}
+                <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
+            {% endfor %}
+          {% endif %}
+            
+          </div>
           <!-- Slide Modal -->
 
           <div class="modal fade modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
@@ -123,42 +144,22 @@
           <table class="table border table-hover bg-white">
             <thead>
               <tr role="row">
-                <th>
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="all">
-                    <label class="custom-control-label" for="all"></label>
-                  </div>
-                </th>
                 <th>ID</th>
-                <th>Produit</th>
-                <th>Quantité</th>
-                <th>Date</th>
-                <th>Status</th>
+                <th>Nom</th>
+                <th>Prix Unitaire</th>
+                <th>Description</th>
+                <th>Catégorie</th>
+                <!-- <th>Status</th>  -->
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {% for stock in stocks %}
-                <tr>
-                  <td class="align-center">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" id="{{ stock.id }}" class="custom-control-input">
-                      <label for="{{ stock.id }}" class="custom-control-label"></label>
-                    </div>
-                  </td>
-                  <td>{{ stock.id }}</td>
-                  <td>{{ stock.IdProduit.Nom }}</td>
-                  <td>{{ stock.QuantiteStock }}</td>
-                  <td>{{ stock.Date }}</td>
-                  
-                  <td>
-                    {% if stock.QuantiteStock >= 250  %}
-                        <p class="text-success">stock fort</p>
-                    {% else %}
-                        <p class="text-danger">stock faible</p>
-                    {% endif %}
-                    
-                  </td>
+              {% for produit in produits %}
+                  <td>{{ produit.id }}</td>
+                  <td>{{ produit.Nom }}</td>
+                  <td>{{ produit.PrixUnitaire }}</td>
+                  <td>{{ produit.Description }}</td>
+                  <td>{{ produit.IdCategorie.nom }}</td>
                   
                 <td>
                   <div class="dropdown">
@@ -166,9 +167,8 @@
                       <span class="text-muted sr-only">Action</span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right">
-                      <a class="dropdown-item" href="">Modifier</a>
-                      <a class="dropdown-item" href="#">Remove</a>
-                      <a class="dropdown-item" href="#">Assign</a>
+                      <a class="dropdown-item" href="{% url 'modif_produit' produit.id %}">Modifier</a>
+                      <a class="dropdown-item" href="{% url 'supprimer_produit' produit.id %}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer le produit {{produit.Nom }} ?')">Supprimer</a>
                     </div>
                   </div>
                 </td>
@@ -189,16 +189,16 @@
           </nav> -->
           <nav aria-label="Page navigation">
             <ul class="pagination justify-content-end mb-0">
-              {% if stocks.has_previous %}
+              {% if produit.has_previous %}
                 <li class="page-item">
-                  <a class="page-link" href="?page={{ stocks.previous_page_number }}" aria-label="Précédente">
+                  <a class="page-link" href="?page={{ produit.previous_page_number }}" aria-label="Précédente">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
               {% endif %}
               
-              {% with current=stocks.number first_page=1 last_page=stocks.paginator.num_pages %}
-                {% with prev=stocks.number|add:"-1" next=stocks.number|add:"1" %}
+              {% with current=produits.number first_page=1 last_page=produits.paginator.num_pages %}
+                {% with prev=produits.number|add:"-1" next=produits.number|add:"1" %}
                   {% if current > 2 %}
                     <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
                   {% endif %}
@@ -227,9 +227,9 @@
                 {% endwith %}
               {% endwith %}
               
-              {% if stocks.has_next %}
+              {% if produits.has_next %}
                 <li class="page-item">
-                  <a class="page-link" href="?page={{ stocks.next_page_number }}" aria-label="Suivante">
+                  <a class="page-link" href="?page={{ produits.next_page_number }}" aria-label="Suivante">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                 </li>
@@ -238,10 +238,106 @@
           </nav>
           
         </div>
-      </div> <!-- .row -->
+    </div> <!-- .row -->
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <h2 class="h3 mb-3 page-title">Catégories de Produit</h2>
+            <div class="row mb-4 items-align-center">
+                <div class="col-md">
+                  <ul class="nav nav-pills justify-content-start">
+                    <li class="nav-item">
+                      <a class="nav-link active bg-transparent pr-2 pl-0 text-primary" href="#">Tout <span class="badge badge-pill bg-primary text-white ml-2">{{nombre_total_categorie_produit}}</span></a>
+                    </li>
+                  </ul>
+                </div>
+                
+                
+              </div>
+            <table class="table border table-hover bg-white">
+                <thead>
+                  <tr role="row">
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for catproduit in categories_produit %}
+                      <td>{{ catproduit.id }}</td>
+                      <td>{{ catproduit.nom }}</td>
+                      
+                    <td>
+                      <div class="dropdown">
+                        <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <span class="text-muted sr-only">Action</span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                          <a class="dropdown-item" href="{% url 'modif_categorie' catproduit.id %}">Modifier</a>
+                          <a class="dropdown-item" href="{% url 'supprimer_categorie' catproduit.id %}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer la Catégorie de produit {{ catproduit.nom }} ?')">Supprimer</a>
+                        </div>
+                      </div>
+                    </td>
+                    </tr>
+                  {% endfor %}
+                  
+                  
+                </tbody>
+              </table>
+              <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-end mb-0">
+                  {% if catproduit.has_previous %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ catproduit.previous_page_number }}" aria-label="Précédente">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                  {% endif %}
+                  
+                  {% with current=categories_produit.number first_page=1 last_page=categories_produit.paginator.num_pages %}
+                    {% with prev=categories_produit.number|add:"-1" next=categories_produit.number|add:"1" %}
+                      {% if current > 2 %}
+                        <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
+                      {% endif %}
+                      
+                      {% if current|add:"-2" > first_page %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                      {% endif %}
+                      
+                      {% if prev >= first_page %}
+                        <li class="page-item"><a class="page-link" href="?page={{ prev }}">{{ prev }}</a></li>
+                      {% endif %}
+                      
+                      <li class="page-item active"><span class="page-link">{{ current }}</span></li>
+                      
+                      {% if next <= last_page %}
+                        <li class="page-item"><a class="page-link" href="?page={{ next }}">{{ next }}</a></li>
+                      {% endif %}
+                      
+                      {% if current|add:"2" < last_page %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                      {% endif %}
+                      
+                      {% if current < last_page|add:"-1" %}
+                        <li class="page-item"><a class="page-link" href="?page={{ last_page }}">{{ last_page }}</a></li>
+                      {% endif %}
+                    {% endwith %}
+                  {% endwith %}
+                  
+                  {% if categories_produit.has_next %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ categories_produit.next_page_number }}" aria-label="Suivante">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </nav>
+
+        </div>
+    </div>
     </div> <!-- .container-fluid -->
     <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
@@ -254,25 +350,51 @@
               <div class="list-group-item bg-transparent">
                 <div class="row align-items-center">
                   <div class="col-auto">
-                    <!-- <span class="fe fe-box fe-24"></span> -->
+                    <span class="fe fe-box fe-24"></span>
                   </div>
                   <div class="col">
-                    {% for notification in notifications %}
-                        {% if notifications %}
-                            <small><strong>{{ notification.message }}</strong></small>
-                            <div class="my-0 text-muted small">Il y a {{ notification.date | timesince }}</div>
-                            <a href="#" class="mark-as-read" data-notification-id="{{ notification.id }}"><small class="badge badge-pill badge-light text-muted">Marquer comme lu</small></a>
-                            <br>
-                            <hr>
-                        {% else %}
-                            <small><strong>Vous n'avez aucune notification</strong></small>
-                        {% endif %}
-                    {% endfor %}
+                    <small><strong>Package has uploaded successfull</strong></small>
+                    <div class="my-0 text-muted small">Package is zipped and uploaded</div>
+                    <small class="badge badge-pill badge-light text-muted">1m ago</small>
                   </div>
                 </div>
               </div>
-               
-              
+              <div class="list-group-item bg-transparent">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <span class="fe fe-download fe-24"></span>
+                  </div>
+                  <div class="col">
+                    <small><strong>Widgets are updated successfull</strong></small>
+                    <div class="my-0 text-muted small">Just create new layout Index, form, table</div>
+                    <small class="badge badge-pill badge-light text-muted">2m ago</small>
+                  </div>
+                </div>
+              </div>
+              <div class="list-group-item bg-transparent">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <span class="fe fe-inbox fe-24"></span>
+                  </div>
+                  <div class="col">
+                    <small><strong>Notifications have been sent</strong></small>
+                    <div class="my-0 text-muted small">Fusce dapibus, tellus ac cursus commodo</div>
+                    <small class="badge badge-pill badge-light text-muted">30m ago</small>
+                  </div>
+                </div> <!-- / .row -->
+              </div>
+              <div class="list-group-item bg-transparent">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <span class="fe fe-link fe-24"></span>
+                  </div>
+                  <div class="col">
+                    <small><strong>Link was attached to menu</strong></small>
+                    <div class="my-0 text-muted small">New layout has been attached to the menu</div>
+                    <small class="badge badge-pill badge-light text-muted">1h ago</small>
+                  </div>
+                </div>
+              </div> <!-- / .row -->
             </div> <!-- / .list-group -->
           </div>
           <div class="modal-footer">
@@ -356,39 +478,6 @@
     <script src="{% static 'app/js/quill.min.js' %}"></script>
     <script src="{% static 'app/js/daterangepicker.js' %}"></script>
     <script src="{% static 'app/js/jquery.steps.min.js' %}"></script>
-
-    <!-- notification -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const markAsReadButtons = document.querySelectorAll('.mark-as-read');
-        
-            markAsReadButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const notificationId = this.getAttribute('data-notification-id');
-                    
-                    fetch(`/notifications/mark-as-read/${notificationId}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'X-CSRFToken': '{{ csrf_token }}',
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if(data.success) {
-                            // Mettre à jour l'UI: par exemple, estomper la notification ou ajouter un icône "check"
-                            this.parentElement.style.opacity = '0.5';
-                            // Ajouter un icône check si souhaité
-                            this.parentElement.innerHTML += ' <span class="check-icon">&#10003;</span>';
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-                });
-            });
-        });
-    </script>
-        
   <script>
     $('.select2').select2(
     {

@@ -1,19 +1,19 @@
-{% extends "app/base.html" %}
+{% extends "app/Partials/base_admin.html" %}
 {% load static %}
-{% block title %} Ventes {% endblock title %}
+{% block title %} Liste Clients {% endblock title %}
 
 {% block main-content %}
 <main role="main" class="main-content">
     <div class="container-fluid">
       <div class="row justify-content-center">
         <div class="col-12">
-          <h2 class="h3 mb-3 page-title">Ventes</h2>
+          <h2 class="h3 mb-3 page-title">Clients</h2>
             
           <div class="row mb-4 items-align-center">
             <div class="col-md">
               <ul class="nav nav-pills justify-content-start">
                 <li class="nav-item">
-                  <a class="nav-link active bg-transparent pr-2 pl-0 text-primary" href="#">Tout <span class="badge badge-pill bg-primary text-white ml-2">{{nombre_total_ventes}}</span></a>
+                  <a class="nav-link active bg-transparent pr-2 pl-0 text-primary" href="#">Tout <span class="badge badge-pill bg-primary text-white ml-2">{{nombre_total_client}}</span></a>
                 </li>
                 <!-- <li class="nav-item">
                   <a class="nav-link text-muted px-2" href="#">Pending <span class="badge badge-pill bg-white border text-muted ml-2">64</span></a>
@@ -31,9 +31,9 @@
                 <a href="#" class="text-muted"><i class="fe fe-x mx-1"></i></a>
                 <span class="text-muted">Status : <strong>Pending</strong></span>
               </span> -->
-              <span class="small py-1 px-2 mr-2 d-none d-lg-inline">
-                <a href="{% url 'ajout_vente' %}" class="btn btn-success">Ajouter une vente</a>
-              </span>
+              <!-- <span class="small py-1 px-2 mr-2 d-none d-lg-inline">
+                <a href="{% url 'inscription_vendeur' %}" class="btn btn-success">Ajouter un Vendeur</a>
+              </span> -->
               <button type="button" class="btn" data-toggle="modal" data-target=".modal-slide"><span class="fe fe-filter fe-16 text-muted"></span></button>
               <button type="button" class="btn"><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
             </div>
@@ -45,17 +45,7 @@
                 <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
             {% endfor %}
           {% endif %}
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="row">
-                    <div class="col-md-8">
-                        {{ form.as_p }}
-                    </div>
-                    <div class="col-md-2  mt-4">
-                        <button type="submit" class="btn btn-success ml-4 text-white fw-bold">Téléverser</button>
-                    </div>
-                </div>
-            </form>
+            
           </div>
           <!-- Slide Modal -->
 
@@ -155,58 +145,27 @@
           <table class="table border table-hover bg-white">
             <thead>
               <tr role="row">
-                <th>
-                  <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="all">
-                    <label class="custom-control-label" for="all"></label>
-                  </div>
-                </th>
                 <th>ID</th>
-                <th>Produit</th>
-                <!-- <th>Prix Unit.</th> -->
-                <th>Catégorie</th>
-                <th>Client</th>
-                <!-- <th>Vendeur</th> -->
-                <th>Quantité</th>
-                <th>Montant</th>
-                <th>Date</th>
+                <th>Nom</th>
+                <th>Prenoms</th>
+                <th>Genre</th>
+                <th>Téléphone</th>
+                <th>ville</th>
+                <!-- <th>Date</th> -->
                 <!-- <th>Total</th>
                 <th>Payment</th>
                 <th>Status</th> -->
-                <th>Action</th>
+                <!-- <th>Action</th> -->
               </tr>
             </thead>
             <tbody>
-              {% for vente in ventes %}
-                <tr>
-                  <td class="align-center">
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" id="{{ vente.id }}" class="custom-control-input">
-                      <label for="{{ vente.id }}" class="custom-control-label"></label>
-                    </div>
-                  </td>
-                  <td>{{ vente.id }}</td>
-                  <td>{{ vente.IdProduit.Nom }}</td>
-                  <!-- <td>{{ vente.IdProduit.PrixUnitaire }}</td> -->
-                  <td>{{ vente.IdProduit.IdCategorie.nom }}</td>
-                  <td>{{ vente.IdClient.prenoms }} {{ vente.IdClient.nom }}</td>
-                  <!-- <td>{{ vente.IdVendeur.prenoms }} {{ vente.IdVendeur.nom }}</td> -->
-                  <td>{{ vente.QuantiteVendu }}</td>
-                  <td>{{ vente.MontantTotal }}</td>
-                  <td>{{ vente.DateVente }}</td>
-                  
-                <td>
-                  <div class="dropdown">
-                    <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      <span class="text-muted sr-only">Action</span>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-right">
-                      <a class="dropdown-item" href="#">Edit</a>
-                      <a class="dropdown-item" href="#">Remove</a>
-                      <a class="dropdown-item" href="#">Assign</a>
-                    </div>
-                  </div>
-                </td>
+              {% for client in clients %}
+                  <td>{{ client.id }}</td>
+                  <td>{{ client.nom }}</td>
+                  <td>{{ client.prenoms }}</td>
+                  <td>{{ client.genre }}</td>
+                  <td>{{ client.telephone }}</td>
+                  <td>{{ client.ville }}</td>
                 </tr>
               {% endfor %}
               
@@ -224,16 +183,16 @@
           </nav> -->
           <nav aria-label="Page navigation">
             <ul class="pagination justify-content-end mb-0">
-              {% if ventes.has_previous %}
+              {% if client.has_previous %}
                 <li class="page-item">
-                  <a class="page-link" href="?page={{ ventes.previous_page_number }}" aria-label="Précédente">
+                  <a class="page-link" href="?page={{ client.previous_page_number }}" aria-label="Précédente">
                     <span aria-hidden="true">&laquo;</span>
                   </a>
                 </li>
               {% endif %}
               
-              {% with current=ventes.number first_page=1 last_page=ventes.paginator.num_pages %}
-                {% with prev=ventes.number|add:"-1" next=ventes.number|add:"1" %}
+              {% with current=clients.number first_page=1 last_page=clients.paginator.num_pages %}
+                {% with prev=clients.number|add:"-1" next=clients.number|add:"1" %}
                   {% if current > 2 %}
                     <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
                   {% endif %}
@@ -262,9 +221,9 @@
                 {% endwith %}
               {% endwith %}
               
-              {% if ventes.has_next %}
+              {% if clients.has_next %}
                 <li class="page-item">
-                  <a class="page-link" href="?page={{ ventes.next_page_number }}" aria-label="Suivante">
+                  <a class="page-link" href="?page={{ clients.next_page_number }}" aria-label="Suivante">
                     <span aria-hidden="true">&raquo;</span>
                   </a>
                 </li>

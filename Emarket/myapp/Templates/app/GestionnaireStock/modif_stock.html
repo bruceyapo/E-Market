@@ -1,4 +1,4 @@
-{% extends "app/base.html" %}
+{% extends "app/Partials/base_gest.html" %}
 {% load static %}
 {% block title %} Modification Stock {% endblock title %}
 
@@ -7,14 +7,15 @@
     
     <form method="post" class="col-lg-6 col-md-4 col-10 mx-auto text-center shadow bg-white px-5 py-3 rounded">
         {% csrf_token %}
-        <div id="form-container">
+        <div id="form-container" class="table-responsive" style="height: 300px;">
             <div class="form-group" id="form-0">
-                {{ form.produit_0.label_tag }} {{ form.produit_0 }} 
+                {{ form.produit_0.label_tag }} {{ form.produit_0 }}
+                <br> 
                 {{ form.quantite_0.label_tag }} {{ form.quantite_0 }}
-            </div>
+            </div><br>
         </div>
-        <button type="button" onclick="addForm()">Ajouter un produit</button>
-        <button type="submit">Mettre à jour le stock</button>
+        <button type="button" class="btn btn-secondary" onclick="addForm()">Ajouter un produit</button>
+        <button type="submit" class="btn btn-primary">Mettre à jour</button>
     </form>
 </div>
 <script>

@@ -14,28 +14,19 @@
             {% endfor %}
         {% endif %}
         <div class="mx-auto text-center my-4">
-          <h2 class="my-3"> Inscription admin</h2>
+          <h2 class="my-3">Modifier </h2>
         </div>
         <div class="row">
-          <div class="col-md-12">
-            <div>
-              {{ form.nom.label_tag }}
-              {{ form.nom }}
-            </div>
-          </div>
-        </div>
-        <br>
-        <div class="row">
-          <div class="col-md-6">    
+          <div class="col-md-6">
+              <div>
+                {{ form.nom.label_tag }}
+                {{ form.nom }}
+              </div>
+          <br>
             <div>
                 {{ form.prenoms.label_tag }}
                 {{ form.prenoms }}
             </div>
-          <br>
-          <div>
-            {{ form.telephone.label_tag }}
-            {{ form.telephone }}
-          </div>
           <br>
             <div>
               {{ form.image.label_tag }}
@@ -44,19 +35,20 @@
           </div>
           <div class="col-md-6">
             <div>
+              {{ form.telephone.label_tag }}
+              {{ form.telephone }}
+            </div>
+            <br>
+            <div>
                 {{ form.email.label_tag }}
                 {{ form.email }}
             </div>
             <br>
             <div>
-                {{ form.password.label_tag }}
-                {{ form.password }}
+                {{ form.ville.label_tag }}
+                {{ form.ville }}
             </div>
-            <br>
-            <div>
-                {{ form.confirm_password.label_tag }}
-                {{ form.confirm_password }}
-            </div>
+            
           </div>
         </div>
         <br>
@@ -64,8 +56,6 @@
       </form>
     </div>
   </div>
-
-
   <script>
     // Attendre 7 secondes avant de masquer le message
     setTimeout(function() {

@@ -1,0 +1,596 @@
+{% extends "app/Partials/base_gest.html" %}
+{% load static %}
+{% block title %} Stock {% endblock title %}
+
+{% block main-content %}
+<main role="main" class="main-content">
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-12">
+          <h2 class="h3 mb-3 page-title">Stock</h2>
+            
+          <div class="row mb-4 items-align-center">
+            <div class="col-md-auto ml-auto text-right">
+                <span class="small py-1 px-2 mr-2 d-lg-inline">
+                    <a href="{% url 'modif_stock' %}" class="btn btn-success">Mettre à jour le stock</a>
+                  </span>
+              <button type="button" class="btn" data-toggle="modal" data-target=".modal-slide"><span class="fe fe-filter fe-16 text-muted"></span></button>
+              <button type="button" class="btn"><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
+            </div>
+            
+          </div>
+          {% if messages %}
+          {% for msg in messages %}
+              <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
+          {% endfor %}
+        {% endif %}
+          
+          <!-- Slide Modal -->
+
+          <div class="modal fade modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="defaultModalLabel">Filters</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i class="fe fe-x fe-12"></i>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="p-2">
+                    <div class="form-group my-4">
+                      <p class="mb-2"><strong>Regions</strong></p>
+                      <label for="multi-select2" class="sr-only"></label>
+                      <select class="form-control select2-multi" id="multi-select2">
+                        <optgroup label="Mountain Time Zone">
+                          <option value="AZ">Arizona</option>
+                          <option value="CO">Colorado</option>
+                          <option value="ID">Idaho</option>
+                          <option value="MT">Montana</option>
+                          <option value="NE">Nebraska</option>
+                          <option value="NM">New Mexico</option>
+                          <option value="ND">North Dakota</option>
+                          <option value="UT">Utah</option>
+                          <option value="WY">Wyoming</option>
+                        </optgroup>
+                        <optgroup label="Central Time Zone">
+                          <option value="AL">Alabama</option>
+                          <option value="AR">Arkansas</option>
+                          <option value="IL">Illinois</option>
+                          <option value="IA">Iowa</option>
+                          <option value="KS">Kansas</option>
+                          <option value="KY">Kentucky</option>
+                          <option value="LA">Louisiana</option>
+                          <option value="MN">Minnesota</option>
+                          <option value="MS">Mississippi</option>
+                          <option value="MO">Missouri</option>
+                          <option value="OK">Oklahoma</option>
+                          <option value="SD">South Dakota</option>
+                          <option value="TX">Texas</option>
+                          <option value="TN">Tennessee</option>
+                          <option value="WI">Wisconsin</option>
+                        </optgroup>
+                      </select>
+                    </div> <!-- form-group -->
+                    <div class="form-group my-4">
+                      <p class="mb-2">
+                        <strong>Payment</strong>
+                      </p>
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="customCheck1">
+                        <label class="custom-control-label" for="customCheck1">Paypal</label>
+                      </div>
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="customCheck2">
+                        <label class="custom-control-label" for="customCheck2">Credit Card</label>
+                      </div>
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="customCheck1-1" checked>
+                        <label class="custom-control-label" for="customCheck1">Wire Transfer</label>
+                      </div>
+                    </div> <!-- form-group -->
+                    <div class="form-group my-4">
+                      <p class="mb-2">
+                        <strong>Types</strong>
+                      </p>
+                      <div class="custom-control custom-radio">
+                        <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
+                        <label class="custom-control-label" for="customRadio1">End users</label>
+                      </div>
+                      <div class="custom-control custom-radio">
+                        <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input" checked>
+                        <label class="custom-control-label" for="customRadio2">Whole Sales</label>
+                      </div>
+                    </div> <!-- form-group -->
+                    <div class="form-group my-4">
+                      <p class="mb-2">
+                        <strong>Completed</strong>
+                      </p>
+                      <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="customSwitch1">
+                        <label class="custom-control-label" for="customSwitch1">Include</label>
+                      </div>
+                    </div> <!-- form-group -->
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn mb-2 btn-primary btn-block">Apply</button>
+                  <button type="button" class="btn mb-2 btn-secondary btn-block">Reset</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <table class="table border table-hover bg-white">
+            <thead>
+              <tr role="row">
+                <th>ID</th>
+                <th>Produit</th>
+                <th>Quantité</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for stock in stocks %}
+                <tr>
+                  <td>{{ stock.id }}</td>
+                  <td>{{ stock.IdProduit.Nom }}</td>
+                  <td>{{ stock.QuantiteStock }}</td>
+                  <td>{{ stock.Date }}</td>
+                  
+                  <td>
+                    {% if stock.QuantiteStock >= 250  %}
+                        <p class="text-success">stock fort</p>
+                    {% else %}
+                        <p class="text-danger">stock faible</p>
+                    {% endif %}
+                    
+                  </td>
+                  
+                <td>
+                  <div class="dropdown">
+                    <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="text-muted sr-only">Action</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right">
+                      <a class="dropdown-item" href="">Modifier</a>
+                      <a class="dropdown-item" href="#">Remove</a>
+                      <a class="dropdown-item" href="#">Assign</a>
+                    </div>
+                  </div>
+                </td>
+                </tr>
+              {% endfor %}
+              
+              
+            </tbody>
+          </table>
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-end mb-0">
+              {% if stocks.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ stocks.previous_page_number }}" aria-label="Précédente">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% with current=stocks.number first_page=1 last_page=stocks.paginator.num_pages %}
+                {% with prev=stocks.number|add:"-1" next=stocks.number|add:"1" %}
+                  {% if current > 2 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"-2" > first_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if prev >= first_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ prev }}">{{ prev }}</a></li>
+                  {% endif %}
+                  
+                  <li class="page-item active"><span class="page-link">{{ current }}</span></li>
+                  
+                  {% if next <= last_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ next }}">{{ next }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"2" < last_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if current < last_page|add:"-1" %}
+                    <li class="page-item"><a class="page-link" href="?page={{ last_page }}">{{ last_page }}</a></li>
+                  {% endif %}
+                {% endwith %}
+              {% endwith %}
+              
+              {% if stocks.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ stocks.next_page_number }}" aria-label="Suivante">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+          
+        </div>
+      </div> <!-- .row -->
+    </div> <!-- .container-fluid -->
+    <div class="modal fade modal-notif modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document" style="height: auto;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="defaultModalLabel">Notifications</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="list-group list-group-flush my-n3">
+              <div class="list-group-item bg-transparent">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <!-- <span class="fe fe-box fe-24"></span> -->
+                  </div>
+                  <div class="col">
+                    {% for notification in notifications %}
+                       
+                            <small><strong>{{ notification.message }}</strong></small>
+                            <div class="my-0 text-muted small">Il y a {{ notification.date | timesince }}</div>
+                            <a href="#" class="mark-as-read" data-notification-id="{{ notification.id }}"><small class="badge badge-pill badge-light text-muted">Marquer comme lu</small></a>
+                            <br>
+                            <hr>
+                        
+                        {% empty%}
+                        <small><strong>Vous n'avez aucune notification</strong></small>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+               
+              
+            </div> <!-- / .list-group -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-block" data-dismiss="modal">Clear All</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade modal-shortcut modal-slide" tabindex="-1" role="dialog" aria-labelledby="defaultModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="defaultModalLabel">Shortcuts</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body px-5">
+            <div class="row align-items-center">
+              <div class="col-6 text-center">
+                <div class="squircle bg-success justify-content-center">
+                  <i class="fe fe-cpu fe-32 align-self-center text-white"></i>
+                </div>
+                <p>Control area</p>
+              </div>
+              <div class="col-6 text-center">
+                <div class="squircle bg-primary justify-content-center">
+                  <i class="fe fe-activity fe-32 align-self-center text-white"></i>
+                </div>
+                <p>Activity</p>
+              </div>
+            </div>
+            <div class="row align-items-center">
+              <div class="col-6 text-center">
+                <div class="squircle bg-primary justify-content-center">
+                  <i class="fe fe-droplet fe-32 align-self-center text-white"></i>
+                </div>
+                <p>Droplet</p>
+              </div>
+              <div class="col-6 text-center">
+                <div class="squircle bg-primary justify-content-center">
+                  <i class="fe fe-upload-cloud fe-32 align-self-center text-white"></i>
+                </div>
+                <p>Upload</p>
+              </div>
+            </div>
+            <div class="row align-items-center">
+              <div class="col-6 text-center">
+                <div class="squircle bg-primary justify-content-center">
+                  <i class="fe fe-users fe-32 align-self-center text-white"></i>
+                </div>
+                <p>Users</p>
+              </div>
+              <div class="col-6 text-center">
+                <div class="squircle bg-primary justify-content-center">
+                  <i class="fe fe-settings fe-32 align-self-center text-white"></i>
+                </div>
+                <p>Settings</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main> <!-- main -->
+  <script>
+    /* defind global options */
+    Chart.defaults.global.defaultFontFamily = base.defaultFontFamily;
+    Chart.defaults.global.defaultFontColor = colors.mutedColor;
+  </script>
+  <script src="{% static 'app/js/gauge.min.js' %}"></script>
+    <script src="{% static 'app/js/jquery.sparkline.min.js' %}"></script>
+    <script src="{% static 'app/js/apexcharts.min.js' %}"></script>
+    <script src="{% static 'appjs/apexcharts.custom.js' %}"></script>
+    <script src="{% static 'app/js/jquery.mask.min.js' %}"></script>
+    <script src="{% static 'app/js/select2.min.js' %}"></script>
+    <script src="{% static 'app/js/jquery.validate.min.js' %}"></script>
+    <script src="{% static 'app/js/jquery.timepicker.js' %}"></script>
+    <script src="{% static 'app/js/dropzone.min.js' %}"></script>
+    <script src="{% static 'app/js/uppy.min.js' %}"></script>
+    <script src="{% static 'app/js/quill.min.js' %}"></script>
+    <script src="{% static 'app/js/daterangepicker.js' %}"></script>
+    <script src="{% static 'app/js/jquery.steps.min.js' %}"></script>
+
+    <!-- notification -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const markAsReadButtons = document.querySelectorAll('.mark-as-read');
+        
+            markAsReadButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const notificationId = this.getAttribute('data-notification-id');
+                    
+                    fetch(`/notifications/mark-as-read/${notificationId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.success) {
+                            // Mettre à jour l'UI: par exemple, estomper la notification ou ajouter un icône "check"
+                            this.parentElement.style.opacity = '0.5';
+                            // Ajouter un icône check si souhaité
+                            this.parentElement.innerHTML += ' <span class="check-icon">&#10003;</span>';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                });
+            });
+        });
+    </script>
+        
+  <script>
+    $('.select2').select2(
+    {
+      theme: 'bootstrap4',
+    });
+    $('.select2-multi').select2(
+    {
+      multiple: true,
+      theme: 'bootstrap4',
+    });
+    $('.drgpicker').daterangepicker(
+    {
+      singleDatePicker: true,
+      timePicker: false,
+      showDropdowns: true,
+      locale:
+      {
+        format: 'MM/DD/YYYY'
+      }
+    });
+    $('.time-input').timepicker(
+    {
+      'scrollDefault': 'now',
+      'zindex': '9999' /* fix modal open */
+    });
+    /** date range picker */
+    if ($('.datetimes').length)
+    {
+      $('.datetimes').daterangepicker(
+      {
+        timePicker: true,
+        startDate: moment().startOf('hour'),
+        endDate: moment().startOf('hour').add(32, 'hour'),
+        locale:
+        {
+          format: 'M/DD hh:mm A'
+        }
+      });
+    }
+    var start = moment().subtract(29, 'days');
+    var end = moment();
+
+    function cb(start, end)
+    {
+      $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    }
+    $('#reportrange').daterangepicker(
+    {
+      startDate: start,
+      endDate: end,
+      ranges:
+      {
+        'Today': [moment(), moment()],
+        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+        'This Month': [moment().startOf('month'), moment().endOf('month')],
+        'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+      }
+    }, cb);
+    cb(start, end);
+    $('.input-placeholder').mask("00/00/0000",
+    {
+      placeholder: "__/__/____"
+    });
+    $('.input-zip').mask('00000-000',
+    {
+      placeholder: "____-___"
+    });
+    $('.input-money').mask("#.##0,00",
+    {
+      reverse: true
+    });
+    $('.input-phoneus').mask('(000) 000-0000');
+    $('.input-mixed').mask('AAA 000-S0S');
+    $('.input-ip').mask('0ZZ.0ZZ.0ZZ.0ZZ',
+    {
+      translation:
+      {
+        'Z':
+        {
+          pattern: /[0-9]/,
+          optional: true
+        }
+      },
+      placeholder: "___.___.___.___"
+    });
+    // editor
+    var editor = document.getElementById('editor');
+    if (editor)
+    {
+      var toolbarOptions = [
+        [
+        {
+          'font': []
+        }],
+        [
+        {
+          'header': [1, 2, 3, 4, 5, 6, false]
+        }],
+        ['bold', 'italic', 'underline', 'strike'],
+        ['blockquote', 'code-block'],
+        [
+        {
+          'header': 1
+        },
+        {
+          'header': 2
+        }],
+        [
+        {
+          'list': 'ordered'
+        },
+        {
+          'list': 'bullet'
+        }],
+        [
+        {
+          'script': 'sub'
+        },
+        {
+          'script': 'super'
+        }],
+        [
+        {
+          'indent': '-1'
+        },
+        {
+          'indent': '+1'
+        }], // outdent/indent
+        [
+        {
+          'direction': 'rtl'
+        }], // text direction
+        [
+        {
+          'color': []
+        },
+        {
+          'background': []
+        }], // dropdown with defaults from theme
+        [
+        {
+          'align': []
+        }],
+        ['clean'] // remove formatting button
+      ];
+      var quill = new Quill(editor,
+      {
+        modules:
+        {
+          toolbar: toolbarOptions
+        },
+        theme: 'snow'
+      });
+    }
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function()
+    {
+      'use strict';
+      window.addEventListener('load', function()
+      {
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.getElementsByClassName('needs-validation');
+        // Loop over them and prevent submission
+        var validation = Array.prototype.filter.call(forms, function(form)
+        {
+          form.addEventListener('submit', function(event)
+          {
+            if (form.checkValidity() === false)
+            {
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+          }, false);
+        });
+      }, false);
+    })();
+  </script>
+  <script>
+    var uptarg = document.getElementById('drag-drop-area');
+    if (uptarg)
+    {
+      var uppy = Uppy.Core().use(Uppy.Dashboard,
+      {
+        inline: true,
+        target: uptarg,
+        proudlyDisplayPoweredByUppy: false,
+        theme: 'dark',
+        width: 770,
+        height: 210,
+        plugins: ['Webcam']
+      }).use(Uppy.Tus,
+      {
+        endpoint: 'https://master.tus.io/files/'
+      });
+      uppy.on('complete', (result) =>
+      {
+        console.log('Upload complete! We’ve uploaded these files:', result.successful)
+      });
+    }
+  </script>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag()
+    {
+      dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+    gtag('config', 'UA-56159088-1');
+  </script>
+
+  <script>
+    // Attendre 7 secondes avant de masquer le message
+    setTimeout(function() {
+        var alertMessage = document.getElementById('alert-message');
+        if (alertMessage) {
+            alertMessage.style.display = 'none';
+        }
+    }, 5000); // 7000 millisecondes = 7 secondes
+</script>
+{% endblock main-content %}

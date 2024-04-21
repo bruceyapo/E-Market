@@ -1,5 +1,5 @@
 
-        {% load static %}
+{% load static %}
 <nav class="topnav navbar navbar-light">
     <button type="button" class="navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar">
       <i class="fe fe-menu navbar-toggler-icon"></i>
@@ -26,9 +26,15 @@
       </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle text-muted pr-0" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {% if administrateur.image %}
+          <span class="avatar avatar-sm mt-2">
+            <img src="{{ administrateur.image.url }}" alt="..." class="avatar-img rounded-circle">
+          </span>
+          {% else %}
           <span class="avatar avatar-sm mt-2">
             <img src="{% static 'app/img/default_profil.png' %}" alt="..." class="avatar-img rounded-circle">
           </span>
+          {% endif %}
         </a>
         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
           <a class="dropdown-item" href="#">Profile</a>
@@ -58,7 +64,7 @@
       </div>
       <ul class="navbar-nav flex-fill w-100 mb-2">
         <li class="nav-item mt-4">
-          <a class="nav-link pl-3" href="{% url 'accueilvendeur' %}"><span class="ml-1 item-text">Tableau de bord</span></a>
+          <a class="nav-link pl-3" href="{% url 'accueiladmin' %}"><span class="ml-1 item-text">Tableau de bord</span></a>
         </li>
         <!-- <li class="nav-item dropdown">
           <a href="#dashboard" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
@@ -194,13 +200,51 @@
         </li> -->
       </ul>
       <p class="text-muted nav-heading mt-4 mb-1">
+        <span>Extra</span>
+      </p>
+      <ul class="navbar-nav flex-fill w-100 mb-2">
+        <li class="nav-item dropdown">
+          <a href="#pages" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
+            <i class="fe fe-file fe-16"></i>
+            <span class="ml-3 item-text">Pages</span>
+          </a>
+          <ul class="collapse list-unstyled pl-4 w-100 w-100" id="pages">
+            <li class="nav-item">
+              <a class="nav-link pl-3" href="{% url 'liste_vendeur' %}">
+                <span class="ml-1 item-text">Vendeur</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link pl-3" href="{% url 'liste_client' %}">
+                <span class="ml-1 item-text">Client</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link pl-3" href="{% url 'liste_produit_categorie' %}">
+                <span class="ml-1 item-text">Produit et Catégorie</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link pl-3" href="{% url 'liste_geststock' %}">
+                <span class="ml-1 item-text">Gestonnaire de Stock</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link pl-3" href="./page-blank.html">
+                <span class="ml-1 item-text">Blank</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+      <p class="text-muted nav-heading mt-4 mb-1">
         <span>Apps</span>
       </p>
       <ul class="navbar-nav flex-fill w-100 mb-2">
         <li class="nav-item w-100">
-          <a class="nav-link" href="calendar.html">
+          <a class="nav-link" href="{% url 'calendier_admin' %}">
             <i class="fe fe-calendar fe-16"></i>
-            <span class="ml-3 item-text">Calendar</span>
+            <span class="ml-3 item-text">Calendier</span>
           </a>
         </li>
         <li class="nav-item dropdown">
@@ -226,115 +270,10 @@
             <a class="nav-link pl-3" href="./profile-notification.html"><span class="ml-1">Notifications</span></a>
           </ul>
         </li>
-        <!-- <li class="nav-item dropdown">
-          <a href="#fileman" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-            <i class="fe fe-folder fe-16"></i>
-            <span class="ml-3 item-text">File Manager</span>
-          </a>
-          <ul class="collapse list-unstyled pl-4 w-100" id="fileman">
-            <a class="nav-link pl-3" href="./files-list.html"><span class="ml-1">Files List</span></a>
-            <a class="nav-link pl-3" href="./files-grid.html"><span class="ml-1">Files Grid</span></a>
-          </ul>
-        </li>
-        <li class="nav-item dropdown">
-          <a href="#support" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-            <i class="fe fe-compass fe-16"></i>
-            <span class="ml-3 item-text">Help Desk</span>
-          </a>
-          <ul class="collapse list-unstyled pl-4 w-100" id="support">
-            <a class="nav-link pl-3" href="./support-center.html"><span class="ml-1">Home</span></a>
-            <a class="nav-link pl-3" href="./support-tickets.html"><span class="ml-1">Tickets</span></a>
-            <a class="nav-link pl-3" href="./support-ticket-detail.html"><span class="ml-1">Ticket Detail</span></a>
-            <a class="nav-link pl-3" href="./support-faqs.html"><span class="ml-1">FAQs</span></a>
-          </ul>
-        </li> -->
       </ul>
-      <p class="text-muted nav-heading mt-4 mb-1">
-        <span>Extra</span>
-      </p>
-      <ul class="navbar-nav flex-fill w-100 mb-2">
-        <li class="nav-item dropdown">
-          <a href="#pages" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-            <i class="fe fe-file fe-16"></i>
-            <span class="ml-3 item-text">Pages</span>
-          </a>
-          <ul class="collapse list-unstyled pl-4 w-100 w-100" id="pages">
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="{% url 'ventes' %}">
-                <span class="ml-1 item-text">Ventes</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="{% url 'liste_stock' %}">
-                <span class="ml-1 item-text">Stocks</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="./page-invoice.html">
-                <span class="ml-1 item-text">Invoice</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="./page-404.html">
-                <span class="ml-1 item-text">Page 404</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="./page-500.html">
-                <span class="ml-1 item-text">Page 500</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="./page-blank.html">
-                <span class="ml-1 item-text">Blank</span>
-              </a>
-            </li>
-          </ul>
-        </li>
-        <!-- <li class="nav-item dropdown">
-          <a href="#auth" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-            <i class="fe fe-shield fe-16"></i>
-            <span class="ml-3 item-text">Authentication</span>
-          </a>
-          <ul class="collapse list-unstyled pl-4 w-100" id="auth">
-            <a class="nav-link pl-3" href="./auth-login.html"><span class="ml-1">Login 1</span></a>
-            <a class="nav-link pl-3" href="./auth-login-half.html"><span class="ml-1">Login 2</span></a>
-            <a class="nav-link pl-3" href="./auth-register.html"><span class="ml-1">Register</span></a>
-            <a class="nav-link pl-3" href="./auth-resetpw.html"><span class="ml-1">Reset Password</span></a>
-            <a class="nav-link pl-3" href="./auth-confirm.html"><span class="ml-1">Confirm Password</span></a>
-          </ul>
-        </li> -->
-        <li class="nav-item dropdown">
-          <a href="#layouts" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle nav-link">
-            <i class="fe fe-layout fe-16"></i>
-            <span class="ml-3 item-text">Layout</span>
-          </a>
-          <ul class="collapse list-unstyled pl-4 w-100" id="layouts">
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="./index.html"><span class="ml-1 item-text">Default</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="./index-horizontal.html"><span class="ml-1 item-text">Top Navigation</span></a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link pl-3" href="./index-boxed.html"><span class="ml-1 item-text">Boxed</span></a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-      <!-- <p class="text-muted nav-heading mt-4 mb-1">
-        <span>Documentation</span>
-      </p>
-      <ul class="navbar-nav flex-fill w-100 mb-2">
-        <li class="nav-item w-100">
-          <a class="nav-link" href="../docs/index.html">
-            <i class="fe fe-help-circle fe-16"></i>
-            <span class="ml-3 item-text">Getting Start</span>
-          </a>
-        </li>
-      </ul> -->
+      
       <div class="btn-box w-100 mt-4 mb-1">
-        <a href="https://themeforest.net/item/tinydash-bootstrap-html-admin-dashboard-template/27511269" target="_blank" class="btn mb-2 btn-primary btn-lg btn-block">
+        <a href="#" target="_blank" class="btn mb-2 btn-primary btn-lg btn-block">
           <!-- <i class="fe fe-shopping-cart fe-12 mx-2"></i> -->
           <span class="small">Prediction</span>
         </a>

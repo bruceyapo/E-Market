@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 # Create your models here.
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
@@ -31,7 +33,8 @@ class UtilisateurManager(BaseUserManager):
 
 ROLES_CHOICES= (
     ('Administratuer','Administratuer'),
-    ('Vendeur','Vendeur')
+    ('Vendeur','Vendeur'),
+    ('GesteionnaireStock','GesteionnaireStock')
 )
 class Utilisateur(AbstractBaseUser,PermissionsMixin):
     email = models.EmailField(unique=True)
@@ -59,6 +62,14 @@ class Adminitrateur(models.Model):
     prenoms = models.CharField(max_length=200)
     telephone = models.IntegerField(default=0, null=True)
     image = models.ImageField(upload_to='Admin', default='default_profil.png')
+    IdUtilisateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.nom
+class GesteionnaireStock(models.Model):
+    nom = models.CharField(max_length=50)
+    prenoms = models.CharField(max_length=200)
+    telephone = models.IntegerField(default=0, null=True)
+    image = models.ImageField(upload_to='GesteionnaireStock', default='default_profil.png')
     IdUtilisateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
     def __str__(self):
         return self.nom
@@ -92,10 +103,22 @@ class Vente(models.Model):
     IdProduit = models.ForeignKey(Produit, on_delete=models.CASCADE)
     QuantiteVendu = models.IntegerField()
     MontantTotal = models.DecimalField(max_digits=10, decimal_places=2)
-    DateVente = models.CharField(max_length=100)
+    DateVente = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"Vente {self.Idvente}"
+
+class Recu(models.Model):
+    IdVente = models.ManyToManyField(Vente)  # Ajoutez cette ligne
+    DateCreation = models.DateTimeField(auto_now_add=True)
+    
+# @receiver(post_save, sender=Recu)
+# def gerer_recu(sender, instance, **kwargs):
+#     ventes_associees = instance.IdVente.all()
+#     # Faites quelque chose avec les ventes associées...
+    
+# def get_ventes_associees(self):
+#         return self.IdVente.all()
     
 class Stock(models.Model):
     IdProduit = models.ForeignKey(Produit, on_delete=models.CASCADE)

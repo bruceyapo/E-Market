@@ -1,0 +1,99 @@
+
+{% extends "app/Partials/base_vendeur.html" %}
+{% load static %}
+{% block title %} Reçu de Vente {% endblock title %}
+
+{% block main-content %}
+<div class="col align-items-center mx-auto h-100 " style="width: 60%; margin-left: 210px;">
+    <div class="col-lg-12 col-md-12 col-12 mx-auto shadow bg-white px-5 py-3 rounded print-content">
+        <h1>Informations du reçu</h1>
+
+        <table class="table border table-hover bg-white">
+            <thead>
+              <tr role="row">
+                <th>Id</th>
+                <th>Date de Creation</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for recu in recu_instance %}
+                  <tr>
+                    <td>{{ recu.id }}</td>
+                    <td>{{ recu.DateCreation }}</td>
+                    <td>
+                        <div class="dropdown">
+                          <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="text-muted sr-only">Action</span>
+                          </button>
+                          <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{% url 'details_vente' recu.id %}">Détails</a>
+                            <a class="dropdown-item" href="#" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette vente N° {{vente.id}}?')">Remove</a>
+                            <a class="dropdown-item" href="#">Assign</a>
+                          </div>
+                        </div>
+                      </td>
+                    
+                  </tr>
+                {% endfor %}
+                
+              
+              
+            </tbody>
+          </table>
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-end mb-0">
+              {% if recu_instance.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ recu_instance.previous_page_number }}" aria-label="Précédente">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% with current=recu_instance.number first_page=1 last_page=recu_instance.paginator.num_pages %}
+                {% with prev=recu_instance.number|add:"-1" next=recu_instance.number|add:"1" %}
+                  {% if current > 2 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"-2" > first_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if prev >= first_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ prev }}">{{ prev }}</a></li>
+                  {% endif %}
+                  
+                  <li class="page-item active"><span class="page-link">{{ current }}</span></li>
+                  
+                  {% if next <= last_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ next }}">{{ next }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"2" < last_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if current < last_page|add:"-1" %}
+                    <li class="page-item"><a class="page-link" href="?page={{ last_page }}">{{ last_page }}</a></li>
+                  {% endif %}
+                {% endwith %}
+              {% endwith %}
+              
+              {% if recu_instance.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ recu_instance.next_page_number }}" aria-label="Suivante">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        
+    </div>
+    
+</div>
+
+{% endblock main-content %}
+
