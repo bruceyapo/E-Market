@@ -9,13 +9,16 @@
         <div class="col-12">
           <h2 class="h3 mb-3 page-title">Stock</h2>
             
-          <div class="row mb-4 items-align-center">
-            <div class="col-md-auto ml-auto text-right">
-                <span class="small py-1 px-2 mr-2 d-lg-inline">
+          <div class="row mb-4 items-align-end" >
+            <div class="col-md-4">
+              <span class="small mr-2 d-lg-inline">
+                <input type="search" id="searchInput" class="form-control" placeholder="Rechercher...">
+              </span>
+            </div>
+            <div class="col-md-8 ml-auto text-right ">
+                <span class="small mr-2 d-lg-inline">
                     <a href="{% url 'modif_stock' %}" class="btn btn-success">Mettre à jour le stock</a>
                   </span>
-              <button type="button" class="btn" data-toggle="modal" data-target=".modal-slide"><span class="fe fe-filter fe-16 text-muted"></span></button>
-              <button type="button" class="btn"><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
             </div>
             
           </div>
@@ -318,6 +321,31 @@
     </div>
   </main> <!-- main -->
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const searchInput = document.getElementById("searchInput");
+      const rows = document.querySelectorAll("tbody tr");
+  
+      searchInput.addEventListener("input", function() {
+          const searchText = this.value.toLowerCase();
+          rows.forEach(function(row) {
+              const cells = row.querySelectorAll("td");
+              let found = false;
+              cells.forEach(function(cell) {
+                  const text = cell.textContent.toLowerCase();
+                  if (text.includes(searchText)) {
+                      found = true;
+                  }
+              });
+              if (found) {
+                  row.style.display = "";
+              } else {
+                  row.style.display = "none";
+              }
+          });
+      });
+  });
+  
+  
     /* defind global options */
     Chart.defaults.global.defaultFontFamily = base.defaultFontFamily;
     Chart.defaults.global.defaultFontColor = colors.mutedColor;

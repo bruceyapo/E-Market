@@ -5,12 +5,12 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from .models import client, Vente, Produit
-
+from datetime import date
 User = get_user_model()
 # from django.contrib.auth.models import User
 from django.contrib import messages
 class UploadFileForm(forms.Form):
-    file = forms.FileField(label='Charger un fichier de vente', widget=forms.FileInput(
+    file = forms.FileField(label='', widget=forms.FileInput(
             attrs= {'class':'form-control li'}),
             error_messages={'required': ''}
         )
@@ -360,3 +360,30 @@ class StockUpdateForm(forms.Form):
 #             stock, created = Stock.objects.get_or_create(IdProduit_id=produit_id)
 #             stock.QuantiteStock = quantite
 #             stock.save()
+
+
+class DateForm(forms.Form):
+    # Liste des mois au format (valeur, libellé)
+    MONTH_CHOICES = [('', '---------')] + [
+        (1, 'Janvier'), (2, 'Février'), (3, 'Mars'), (4, 'Avril'),
+        (5, 'Mai'), (6, 'Juin'), (7, 'Juillet'), (8, 'Août'),
+        (9, 'Septembre'), (10, 'Octobre'), (11, 'Novembre'), (12, 'Décembre'),
+    ]
+    
+    # Liste des années à partir de 2021 jusqu'à l'année en cours
+    year_range = range(2021, date.today().year + 1)
+    YEAR_CHOICES = [('', '---------')] + [(year, year) for year in year_range]
+
+    # Champs pour le mois et l'année
+    month = forms.ChoiceField(label='Mois', choices=MONTH_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+    year = forms.ChoiceField(label='Année', choices=YEAR_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
+
+    def clean(self):
+        cleaned_data = super().clean()
+        month = cleaned_data.get('month')
+        year = cleaned_data.get('year')
+        if month and year:
+            # Formater la date comme 'MM/YYYY'
+            cleaned_data['date_input'] = f"{month}/{year}"
+        return cleaned_data
+    

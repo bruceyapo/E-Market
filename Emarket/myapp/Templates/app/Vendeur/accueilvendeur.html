@@ -5,9 +5,15 @@
 {% block main-content %}
 <main role="main" class="main-content">
     <div class="container-fluid">
+      {% if messages %}
+                    {% for msg in messages %}
+                        <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
+                    {% endfor %}
+                  {% endif %}
       <div class="row justify-content-center">
         <div class="col-12">
           <div class="row">
+            
             <div class="col-md-6 col-xl-3 mb-4">
               <div class="card shadow bg-primary text-white border-0">
                 <div class="card-body">
@@ -17,9 +23,9 @@
                         <i class="fe fe-16 fe-shopping-bag text-white mb-0"></i>
                       </span>
                     </div>
-                   
+                    
                     <div class="col pr-0">
-                      <p class="small text-muted mb-0"> Ventes mensuelles {{ utilisateur.email }}</p>
+                      <p class="small text-muted mb-0"> Ventes mensuelles</p>
                       <span class="h3 mb-0 text-white">$1250</span>
                       <span class="small text-muted">+5.5%</span>
                       
@@ -320,181 +326,92 @@
               </div>
             </div>  -->
           </div> <!-- / .row -->
-          <div class="row">
+          <div class="row w-100">
             <!-- Recent orders -->
             <div class="col-md-12">
-              <h6 class="mb-3">Dernières Ventes</h6>
-              <table class="table table-borderless table-striped">
+              <h6 class="mb-3">Dernières Ventes (Total [ {{nombre_total_ventes}} ])</h6>
+              <table class="table border table-hover bg-white">
                 <thead>
                   <tr role="row">
                     <th>ID</th>
-                    <th>Purchase Date</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Address</th>
-                    <th>Total</th>
-                    <th>Payment</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>Produit</th>
+                    <th>Catégorie</th>
+                    <th>Client</th>
+                    <th>Quantité</th>
+                    <th>Montant</th>
+                    <th>Date</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="col">1331</th>
-                    <td>2020-12-26 01:32:21</td>
-                    <td>Kasimir Lindsey</td>
-                    <td>(697) 486-2101</td>
-                    <td>996-3523 Et Ave</td>
-                    <td>$3.64</td>
-                    <td> Paypal</td>
-                    <td>Shipped</td>
-                    <td>
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="col">1156</th>
-                    <td>2020-04-21 00:38:38</td>
-                    <td>Melinda Levy</td>
-                    <td>(748) 927-4423</td>
-                    <td>Ap #516-8821 Vitae Street</td>
-                    <td>$4.18</td>
-                    <td> Paypal</td>
-                    <td>Pending</td>
-                    <td>
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="col">1038</th>
-                    <td>2019-06-25 19:13:36</td>
-                    <td>Aubrey Sweeney</td>
-                    <td>(422) 405-2736</td>
-                    <td>Ap #598-7581 Tellus Av.</td>
-                    <td>$4.98</td>
-                    <td>Credit Card </td>
-                    <td>Processing</td>
-                    <td>
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="col">1227</th>
-                    <td>2021-01-22 13:28:00</td>
-                    <td>Timon Bauer</td>
-                    <td>(690) 965-1551</td>
-                    <td>840-2188 Placerat, Rd.</td>
-                    <td>$3.46</td>
-                    <td> Paypal</td>
-                    <td>Processing</td>
-                    <td>
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="col">1956</th>
-                    <td>2019-11-11 16:23:17</td>
-                    <td>Kelly Barrera</td>
-                    <td>(117) 625-6737</td>
-                    <td>816 Ornare, Street</td>
-                    <td>$4.16</td>
-                    <td>Credit Card </td>
-                    <td>Shipped</td>
-                    <td>
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="col">1669</th>
-                    <td>2021-04-12 07:07:13</td>
-                    <td>Kellie Roach</td>
-                    <td>(422) 748-1761</td>
-                    <td>5432 A St.</td>
-                    <td>$3.53</td>
-                    <td> Paypal</td>
-                    <td>Shipped</td>
-                    <td>
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="col">1909</th>
-                    <td>2020-05-14 00:23:11</td>
-                    <td>Lani Diaz</td>
-                    <td>(767) 486-2253</td>
-                    <td>3328 Ut Street</td>
-                    <td>$4.29</td>
-                    <td> Paypal</td>
-                    <td>Pending</td>
-                    <td>
-                      <div class="dropdown">
-                        <button class="btn btn-sm dropdown-toggle more-vertical" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="text-muted sr-only">Action</span>
-                        </button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                          <a class="dropdown-item" href="#">Edit</a>
-                          <a class="dropdown-item" href="#">Remove</a>
-                          <a class="dropdown-item" href="#">Assign</a>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
+                    {% for vente in ventes %}
+                      <tr>
+                        <td>{{ vente.id }}</td>
+                        <td>{{ vente.IdProduit.Nom }}</td>
+                        <td>{{ vente.IdProduit.IdCategorie.nom }}</td>
+                        <td>{{ vente.IdClient.prenoms }} {{ vente.IdClient.nom }}</td>
+                        <td>{{ vente.QuantiteVendu }}</td>
+                        <td>{{ vente.MontantTotal }}</td>
+                        <td>{{ vente.DateVente }}</td>
+                      </tr>
+                      {% empty %}
+                      <tr>
+                        <td colspan="7" class="text-center">Aucune Vente Recente</td>
+                      </tr>
+                    {% endfor %}
+                    
+                  
+                  
                 </tbody>
               </table>
+              <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-end mb-0">
+                  {% if ventes.has_previous %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ ventes.previous_page_number }}" aria-label="Précédente">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+                  {% endif %}
+                  
+                  {% with current=ventes.number first_page=1 last_page=ventes.paginator.num_pages %}
+                    {% with prev=ventes.number|add:"-1" next=ventes.number|add:"1" %}
+                      {% if current > 2 %}
+                        <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
+                      {% endif %}
+                      
+                      {% if current|add:"-2" > first_page %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                      {% endif %}
+                      
+                      {% if prev >= first_page %}
+                        <li class="page-item"><a class="page-link" href="?page={{ prev }}">{{ prev }}</a></li>
+                      {% endif %}
+                      
+                      <li class="page-item active"><span class="page-link">{{ current }}</span></li>
+                      
+                      {% if next <= last_page %}
+                        <li class="page-item"><a class="page-link" href="?page={{ next }}">{{ next }}</a></li>
+                      {% endif %}
+                      
+                      {% if current|add:"2" < last_page %}
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                      {% endif %}
+                      
+                      {% if current < last_page|add:"-1" %}
+                        <li class="page-item"><a class="page-link" href="?page={{ last_page }}">{{ last_page }}</a></li>
+                      {% endif %}
+                    {% endwith %}
+                  {% endwith %}
+                  
+                  {% if ventes.has_next %}
+                    <li class="page-item">
+                      <a class="page-link" href="?page={{ ventes.next_page_number }}" aria-label="Suivante">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  {% endif %}
+                </ul>
+              </nav>
             </div> <!-- / .col-md-3 -->
           </div> <!-- end section -->
         </div>
@@ -624,7 +541,15 @@
       </div>
     </div>
   </main> 
-  
+  <script>
+    // Attendre 7 secondes avant de masquer le message
+    setTimeout(function() {
+        var alertMessage = document.getElementById('alert-message');
+        if (alertMessage) {
+            alertMessage.style.display = 'none';
+        }
+    }, 7000); // 7000 millisecondes = 7 secondes
+</script>
   <!-- <div class="wrapper vh-100">
     <div class="row align-items-center h-100">
       <form class="col-lg-3 col-md-4 col-10 mx-auto text-center">

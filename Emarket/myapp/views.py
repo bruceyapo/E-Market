@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render,redirect
 from django.views.decorators.http import require_POST
-from .forms import AdminForm, AjoutCategorieForm, AjoutProduitForm, GestStockUpdateForm, StockUpdateForm, UploadFileForm, VendeurForm,ClientForm,LoginForm, VendeurUpdateForm, VenteForm, GesteionnaireStockForm, VerifClientForm
+from .forms import AdminForm, AjoutCategorieForm, AjoutProduitForm, DateForm, GestStockUpdateForm, StockUpdateForm, UploadFileForm, VendeurForm,ClientForm,LoginForm, VendeurUpdateForm, VenteForm, GesteionnaireStockForm, VerifClientForm
 from .models import Adminitrateur, Notification, Recu, Utilisateur, Vendeur, client, CategorieProduit, Produit, Vente, Stock, GesteionnaireStock
 from django.contrib.auth import authenticate, login, logout
 from django.template.loader import render_to_string
@@ -21,12 +21,7 @@ from django.forms import inlineformset_factory
 from django.utils import timezone
 from django.db.models.functions import ExtractMonth, ExtractYear, Cast
 from django.db.models.fields import DateField
-from datetime import datetime
-
-
-
-
-
+from datetime import datetime,timedelta
 
 @login_required(login_url='connexion')
 def accueiladmin(request):
@@ -44,6 +39,21 @@ def accueiladmin(request):
 
     # Top 5 des meilleurs clients
     top_clients = Vente.objects.values('IdClient__nom', 'IdClient__prenoms').annotate(total_purchases=Count('IdClient')).order_by('-total_purchases')[:5]
+    # Récupérer la date et l'heure actuelles
+    now = timezone.now()
+
+    # Calculer la date et l'heure il y a 24 heures
+    twenty_four_hours_ago = now - timedelta(hours=24)
+
+    # Récupérer les ventes réalisées en moins de 24 heures
+    ventes = Vente.objects.filter(DateVente__gte=twenty_four_hours_ago)
+    # Filtrer les ventes en fonction du vendeur
+    # ventes = Vente.objects.filter(IdVendeur=vendeur.id).select_related('IdClient', 'IdProduit', 'IdProduit__IdCategorie', 'IdVendeur')
+    nombre_total_ventes = ventes.count()
+    paginator = Paginator(ventes, 25)  # Affiche 25 ventes par page
+
+    page_number = request.GET.get('page')
+    ventes = paginator.get_page(page_number)
     context = {
         'utilisateur': utilisateur,
         'administrateur': administrateur,
@@ -51,7 +61,7 @@ def accueiladmin(request):
         'best_employee': best_employee,
         'top_clients': top_clients,
     }
-    
+    messages.success(request,f"Heureux de vous revoir M/Mme/Mlle {administrateur.prenoms} {administrateur.nom}")
     return render(request, 'app/admin/accueiladmin.html',locals())
 
 @login_required(login_url='connexion')
@@ -93,7 +103,6 @@ def modif_vendeur(request, vendeur_id):
 
 @login_required(login_url='connexion')
 def liste_client(request):
-    # vendeurs = client.objects.all().select_related('IdUtilisateur')
     clients = client.objects.all()
     nombre_total_client = clients.count()
     paginator = Paginator(clients, 25)  # Affiche 25 ventes par page
@@ -232,16 +241,22 @@ def accueilvendeur(request):
     user = request.user
     # Récupérer l'utilisateur connecté
     utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
-    
     # Utiliser la clé étrangère pour récupérer l'administrateur associé
     vendeur = get_object_or_404(Vendeur, IdUtilisateur=utilisateur)
-    
+    now = timezone.now()
+    # Calculer la date et l'heure il y a 24 heures
+    twenty_four_hours_ago = now - timedelta(hours=24)
+    # Récupérer les ventes réalisées en moins de 24 heures en fonction du vendeur
+    ventes = Vente.objects.filter(IdVendeur=vendeur.id, DateVente__gte=twenty_four_hours_ago).select_related('IdClient', 'IdProduit', 'IdProduit__IdCategorie', 'IdVendeur')
+    nombre_total_ventes = ventes.count()
+    paginator = Paginator(ventes, 25)  # Affiche 25 ventes par page
+    page_number = request.GET.get('page')
+    ventes = paginator.get_page(page_number)
     context = {
         'utilisateur': utilisateur,
         'vendeur': vendeur,
     }
-    print(vendeur.image)
-    print(context['utilisateur'])
+    messages.success(request,f"Heureux de vous revoir M/Mme/Mlle {vendeur.prenoms} {vendeur.nom}")
     return render(request, 'app/Vendeur/accueilvendeur.html',locals())
 
 @login_required(login_url='connexion')
@@ -249,14 +264,13 @@ def accueilGestionnaireStock(request):
     user = request.user
     # Récupérer l'utilisateur connecté
     utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
-    
     # Utiliser la clé étrangère pour récupérer l'administrateur associé
     gestionnaireStock = get_object_or_404(GesteionnaireStock, IdUtilisateur=utilisateur)
-    
     context = {
         'utilisateur': utilisateur,
         'gestionnaireStock': gestionnaireStock,
     }
+    messages.success(request,f"Heureux de vous revoir M/Mme/Mlle {gestionnaireStock.prenoms} {gestionnaireStock.nom}")
     return render(request, 'app/GestionnaireStock/accueilGesteionnaireStock.html',locals())
 
 # Fonction de vue de connexion
@@ -271,9 +285,7 @@ def connexion(request):
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
-                
                  # Redirection en fonction du rôle de l'utilisateur
-                
                 if user.roles == 'Administratuer':
                     next_url = request.GET.get('next', reverse('accueiladmin'))  # 'home' est le nom de l'URL de la page d'accueil
                     return redirect(next_url)
@@ -362,53 +374,123 @@ def inscription_GestionnaireStock(request):
 @login_required(login_url='connexion')
 def visuels(request):
     user = request.user
-    
-    # Convertir DateVente en DateField
-    # Vente.objects.update(DateVente=Cast('DateVente', output_field=DateField()))
-
-    # Récupérer l'utilisateur connecté
     utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
-
-    # Utiliser la clé étrangère pour récupérer l'administrateur associé
+        # Utiliser la clé étrangère pour récupérer l'administrateur associé
     administrateur = get_object_or_404(Adminitrateur, IdUtilisateur=utilisateur)
-    # Meilleur produit vendu
-    best_product = Vente.objects.values('IdProduit__Nom').annotate(total_sold=Sum('QuantiteVendu')).order_by('-total_sold').first()
+    # Si le formulaire a été soumis
+    
+    date_form = DateForm(request.GET)
+    if date_form.is_valid():
+        selected_date_str = date_form.cleaned_data['date_input']
+        # Assurez-vous que selected_date est une instance de date
+        
+            # Convertir la chaîne de caractères en date
+            # Convertir la chaîne de caractères en date
+        selected_date = datetime.strptime(selected_date_str, '%m/%Y')
+        year = selected_date.year
+        month = selected_date.month
+    # else:
+        # date_form = DateForm()
+        # year, month = selected_date.split('-')
 
-    # Meilleur employé
-    best_employee = Vente.objects.values('IdVendeur__nom', 'IdVendeur__prenoms').annotate(total_sales=Sum('MontantTotal')).order_by('-total_sales').first()
+            # Filtrer les ventes par année et mois sélectionnés
+            # ventes = Vente.objects.filter(DateVente__year=year, DateVente__month=month)
+            # Récupérer l'utilisateur connecté
+            
+          # Convertir le mois et l'année en entiers
+        # year = int(year)
+        # month = int(month)
 
-    # Top 5 des meilleurs clients
-    top_clients = Vente.objects.values('IdClient__nom', 'IdClient__prenoms').annotate(total_purchases=Count('IdClient')).order_by('-total_purchases')[:5]
-    
-    # Agrégation pour obtenir le nombre total de ventes par mois/année
-    sales_by_date = Vente.objects.annotate(
-        month=ExtractMonth('DateVente'),
-        year=ExtractYear('DateVente')
-    ).values('year', 'month').annotate(
-        total_sales=Count('id'),
-    ).order_by('year', 'month')
-    
-    ventes = Vente.objects.annotate(
-    mois=ExtractMonth('DateVente'),
-    annee=ExtractYear('DateVente')
-    ).values('mois', 'annee').annotate(
-        chiffre_affaires=Sum('MontantTotal')
-    ).order_by('annee', 'mois')
-    years_months = [f"{sale['year']}-{sale['month']}" for sale in sales_by_date]
-    total_sales = [sale['total_sales'] for sale in sales_by_date]
+        # Filtrer les ventes pour le mois et l'année sélectionnés
+        ventes_for_date = Vente.objects.annotate(
+            year=ExtractYear('DateVente'),
+            month=ExtractMonth('DateVente')
+        ).filter(year=year, month=month)
+        
+        
+        # Meilleur produit vendu
+        # Ensuite, vous pouvez effectuer votre agrégation pour obtenir le meilleur produit vendu
+        best_product = Vente.objects.values('IdProduit__Nom').annotate(total_sold=Sum('QuantiteVendu')).order_by('-total_sold').first()
+        # Ensuite, vous pouvez obtenir les cinq meilleurs produits vendus
+        # top_products = ventes_for_date.values('IdProduit__Nom').annotate(total_sold=Sum('QuantiteVendu')).order_by('-total_sold')[:5]
 
-    # Calculer le chiffre d'affaires total de toutes les ventes
-    total_chiffre_affaires = Vente.objects.aggregate(total_chiffre_affaires=Sum('MontantTotal'))['total_chiffre_affaires']
-    
-    labels = [f"{vente['mois']}/{vente['annee']}" for vente in ventes]
-    data = [vente['chiffre_affaires'] for vente in ventes]
-    data = [float(vente['chiffre_affaires']) for vente in ventes]
-    
-    Listeventes = Vente.objects.all().select_related('IdClient', 'IdProduit', 'IdProduit__IdCategorie', 'IdVendeur')
-    nombre_total_ventes = Listeventes.count()
-    
-    liste_client = client.objects.all()
-    nombre_total_client = liste_client.count()
+        # Meilleur employé
+        best_employee = Vente.objects.filter(DateVente__year=year, DateVente__month=month).values('IdVendeur__nom', 'IdVendeur__prenoms').annotate(total_sales=Sum('MontantTotal')).order_by('-total_sales').first()
+
+        # Top 5 des meilleurs clients
+        top_clients = Vente.objects.filter(DateVente__year=year, DateVente__month=month).values('IdClient__nom', 'IdClient__prenoms').annotate(total_purchases=Count('IdClient')).order_by('-total_purchases')[:5]
+        
+        # Agrégation pour obtenir le nombre total de ventes par mois/année
+        sales_by_date = Vente.objects.filter(DateVente__year=year, DateVente__month=month).annotate(
+            month=ExtractMonth('DateVente'),
+            year=ExtractYear('DateVente')
+        ).values('year', 'month').annotate(
+            total_sales=Count('id'),
+        ).order_by('year', 'month')
+        
+        ventes = Vente.objects.filter(DateVente__year=year, DateVente__month=month).annotate(mois=ExtractMonth('DateVente'),annee=ExtractYear('DateVente')).values('mois', 'annee').annotate(chiffre_affaires=Sum('MontantTotal')).order_by('annee', 'mois')
+        years_months = [f"{sale['year']}-{sale['month']}" for sale in sales_by_date]
+        total_sales = [sale['total_sales'] for sale in sales_by_date]
+
+        # Calculer le chiffre d'affaires total de toutes les ventes
+        total_chiffre_affaires = Vente.objects.filter(DateVente__year=year, DateVente__month=month).aggregate(total_chiffre_affaires=Sum('MontantTotal'))['total_chiffre_affaires']
+        
+        labels = [f"{vente['mois']}/{vente['annee']}" for vente in ventes]
+        data = [vente['chiffre_affaires'] for vente in ventes]
+        data = [float(vente['chiffre_affaires']) for vente in ventes]
+        
+        Listeventes = Vente.objects.filter(DateVente__year=year, DateVente__month=month).select_related('IdClient', 'IdProduit', 'IdProduit__IdCategorie', 'IdVendeur')
+        nombre_total_ventes = Listeventes.count()
+        
+        liste_client = client.objects.all()
+        nombre_total_client = liste_client.count()
+    else:
+        # Si aucune date n'est sélectionnée, afficher toutes les ventes
+        # ventes = Vente.objects.all()
+
+        # Récupérer l'utilisateur connecté
+        utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
+
+        # Utiliser la clé étrangère pour récupérer l'administrateur associé
+        administrateur = get_object_or_404(Adminitrateur, IdUtilisateur=utilisateur)
+        # Meilleur produit vendu
+        best_product = Vente.objects.values('IdProduit__Nom').annotate(total_sold=Sum('QuantiteVendu')).order_by('-total_sold').first()
+
+        # Meilleur employé
+        best_employee = Vente.objects.values('IdVendeur__nom', 'IdVendeur__prenoms').annotate(total_sales=Sum('MontantTotal')).order_by('-total_sales').first()
+
+        # Top 5 des meilleurs clients
+        top_clients = Vente.objects.values('IdClient__nom', 'IdClient__prenoms').annotate(total_purchases=Count('IdClient')).order_by('-total_purchases')[:5]
+        
+        # Agrégation pour obtenir le nombre total de ventes par mois/année
+        sales_by_date = Vente.objects.annotate(
+            month=ExtractMonth('DateVente'),
+            year=ExtractYear('DateVente')
+        ).values('year', 'month').annotate(
+            total_sales=Count('id'),
+        ).order_by('year', 'month')
+        
+        ventes = Vente.objects.annotate(
+        mois=ExtractMonth('DateVente'),
+        annee=ExtractYear('DateVente')
+        ).values('mois', 'annee').annotate(
+            chiffre_affaires=Sum('MontantTotal')
+        ).order_by('annee', 'mois')
+        years_months = [f"{sale['year']}-{sale['month']}" for sale in sales_by_date]
+        total_sales = [sale['total_sales'] for sale in sales_by_date]
+
+        # Calculer le chiffre d'affaires total de toutes les ventes
+        total_chiffre_affaires = Vente.objects.aggregate(total_chiffre_affaires=Sum('MontantTotal'))['total_chiffre_affaires']
+        
+        labels = [f"{vente['mois']}/{vente['annee']}" for vente in ventes]
+        data = [vente['chiffre_affaires'] for vente in ventes]
+        data = [float(vente['chiffre_affaires']) for vente in ventes]
+        
+        Listeventes = Vente.objects.all().select_related('IdClient', 'IdProduit', 'IdProduit__IdCategorie', 'IdVendeur')
+        nombre_total_ventes = Listeventes.count()
+        
+        liste_client = client.objects.all()
+        nombre_total_client = liste_client.count()
   
     context = {
         'utilisateur': utilisateur,
@@ -423,6 +505,71 @@ def visuels(request):
         'data': data,
     }
     return render(request, 'app/admin/visuels.html', locals())
+
+# @login_required(login_url='connexion')
+# def visuels(request):
+#     user = request.user
+    
+#     # Convertir DateVente en DateField
+#     # Vente.objects.update(DateVente=Cast('DateVente', output_field=DateField()))
+
+#     # Récupérer l'utilisateur connecté
+#     utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
+
+#     # Utiliser la clé étrangère pour récupérer l'administrateur associé
+#     administrateur = get_object_or_404(Adminitrateur, IdUtilisateur=utilisateur)
+#     # Meilleur produit vendu
+#     best_product = Vente.objects.values('IdProduit__Nom').annotate(total_sold=Sum('QuantiteVendu')).order_by('-total_sold').first()
+
+#     # Meilleur employé
+#     best_employee = Vente.objects.values('IdVendeur__nom', 'IdVendeur__prenoms').annotate(total_sales=Sum('MontantTotal')).order_by('-total_sales').first()
+
+#     # Top 5 des meilleurs clients
+#     top_clients = Vente.objects.values('IdClient__nom', 'IdClient__prenoms').annotate(total_purchases=Count('IdClient')).order_by('-total_purchases')[:5]
+    
+#     # Agrégation pour obtenir le nombre total de ventes par mois/année
+#     sales_by_date = Vente.objects.annotate(
+#         month=ExtractMonth('DateVente'),
+#         year=ExtractYear('DateVente')
+#     ).values('year', 'month').annotate(
+#         total_sales=Count('id'),
+#     ).order_by('year', 'month')
+    
+#     ventes = Vente.objects.annotate(
+#     mois=ExtractMonth('DateVente'),
+#     annee=ExtractYear('DateVente')
+#     ).values('mois', 'annee').annotate(
+#         chiffre_affaires=Sum('MontantTotal')
+#     ).order_by('annee', 'mois')
+#     years_months = [f"{sale['year']}-{sale['month']}" for sale in sales_by_date]
+#     total_sales = [sale['total_sales'] for sale in sales_by_date]
+
+#     # Calculer le chiffre d'affaires total de toutes les ventes
+#     total_chiffre_affaires = Vente.objects.aggregate(total_chiffre_affaires=Sum('MontantTotal'))['total_chiffre_affaires']
+    
+#     labels = [f"{vente['mois']}/{vente['annee']}" for vente in ventes]
+#     data = [vente['chiffre_affaires'] for vente in ventes]
+#     data = [float(vente['chiffre_affaires']) for vente in ventes]
+    
+#     Listeventes = Vente.objects.all().select_related('IdClient', 'IdProduit', 'IdProduit__IdCategorie', 'IdVendeur')
+#     nombre_total_ventes = Listeventes.count()
+    
+#     liste_client = client.objects.all()
+#     nombre_total_client = liste_client.count()
+  
+#     context = {
+#         'utilisateur': utilisateur,
+#         'administrateur': administrateur,
+#         'best_product': best_product,
+#         'best_employee': best_employee,
+#         'top_clients': top_clients,
+#         'years_months': years_months,
+#         'total_sales': total_sales,
+#         'ventes':ventes,
+#         'labels': labels,
+#         'data': data,
+#     }
+#     return render(request, 'app/admin/visuels.html', locals())
 
 @login_required(login_url='connexion')
 def calendier_admin(request):
@@ -489,6 +636,9 @@ def handle_uploaded_file(file, user_id):
 @login_required(login_url='connexion')
 def ventes(request):
     user = request.user.id
+     # Récupérer l'utilisateur connecté
+    utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
+
     vendeur = get_object_or_404(Vendeur, IdUtilisateur=user)
     # form = UploadFileForm(request.POST, request.FILES)
     if request.method == 'POST':
@@ -518,7 +668,7 @@ def ventes(request):
 
     page_number = request.GET.get('page')
     ventes = paginator.get_page(page_number)
-    return render(request, 'app/Vendeur/ventes.html', {'form': form, 'ventes':ventes, 'nombre_total_ventes':nombre_total_ventes})
+    return render(request, 'app/Vendeur/ventes.html',locals())
 
 
 def get_client_details(request, client_id):
@@ -534,7 +684,12 @@ def get_client_details(request, client_id):
         return JsonResponse({'error': 'Client Non Trouver'}, status=404)
 
 ProduitFormSet = inlineformset_factory(client, Vente, form=VenteForm, extra=1)
-def ajout_vente(request):  
+def ajout_vente(request):
+    user = request.user.id
+     # Récupérer l'utilisateur connecté
+    utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
+
+    vendeur = get_object_or_404(Vendeur, IdUtilisateur=user) 
     if request.method == 'POST':
         client_form = ClientForm(request.POST)
         
@@ -587,13 +742,17 @@ def ajout_vente(request):
         client_form = ClientForm()
         produit_formset = ProduitFormSet()
 
-    return render(request, 'app/Vendeur/ajout_vente.html', {'client_form': client_form, 'produit_formset': produit_formset})
+    return render(request, 'app/Vendeur/ajout_vente.html', locals())
 
 def recu_vente(request, client_id):
+    user = request.user.id
+     # Récupérer l'utilisateur connecté
+    utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
+
+    vendeur = get_object_or_404(Vendeur, IdUtilisateur=user) 
     clients = get_object_or_404(client, id=client_id)
     # Création de l'objet datetime pour la date et l'heure actuelles
     date_et_heure = datetime.now()  # Format jour/mois/année heure:minute:seconde
-    print(date_et_heure)
     ventes = Vente.objects.filter(IdClient=clients, DateVente__date=date_et_heure.date(), DateVente__time__hour=date_et_heure.hour, DateVente__time__minute=date_et_heure.minute)
     total_vente = sum(vente.MontantTotal for vente in ventes)
     # Créer une instance Recu après avoir enregistré les ventes
@@ -605,9 +764,14 @@ def recu_vente(request, client_id):
         # Associer la vente au recu
         recu.IdVente.add(vente)
     
-    return render(request, 'app/Vendeur/recu.html', {'client': clients, 'ventes': ventes, 'total_vente': total_vente})
+    return render(request, 'app/Vendeur/recu.html', locals())
 
 def list_recu(request):
+    user = request.user.id
+     # Récupérer l'utilisateur connecté
+    utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
+
+    vendeur = get_object_or_404(Vendeur, IdUtilisateur=user) 
     # recu_instance = Recu.objects.all()
     # Récupère tous les reçus et filtre ceux ayant au moins une vente associée
     recu_instance = Recu.objects.annotate(vente_count=Count('IdVente')).filter(vente_count__gt=0)
@@ -615,46 +779,28 @@ def list_recu(request):
 
     page_number = request.GET.get('page')
     recu_instance = paginator.get_page(page_number)
-    return render(request, 'app/Vendeur/list_recu.html', {'recu_instance': recu_instance})
+    return render(request, 'app/Vendeur/list_recu.html', {'recu_instance': recu_instance, 'utilisateur':utilisateur, 'vendeur': vendeur})
     
     
 def details_vente(request, recu_id):
     # recu_instance = Recu.objects.get(id=id)
     # ventes_associees = recu_instance.IdVente.all()
-    
+    user = request.user.id
+     # Récupérer l'utilisateur connecté
+    utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
+
+    vendeur = get_object_or_404(Vendeur, IdUtilisateur=user) 
     recu_instance = get_object_or_404(Recu, id=recu_id)
     ventes_associees = recu_instance.IdVente.all()
     total_vente = sum(vente.MontantTotal for vente in ventes_associees)
     # Le reste de votre code...
-    return render(request, 'app/Vendeur/details_vente.html', {'recu': recu_instance, 'ventes': ventes_associees, 'total_vente':total_vente})
+    return render(request, 'app/Vendeur/details_vente.html', {'recu': recu_instance, 'ventes': ventes_associees, 'total_vente':total_vente, 'utilisateur':utilisateur, 'vendeur': vendeur})
     
-    
-    
-# def imprimer_recu(request, vente_id):
-#     vente = get_object_or_404(Vente, id=vente_id)
-#     html = render_to_string('app/recu.html', {'vente': vente})  # Créez un template HTML pour le reçu
-#     options = {
-#         'page-size': 'Letter',
-#         'encoding': 'UTF-8',
-#     }
-#     pdf = pdfkit.from_string(html, False, options=options)  # Génère le PDF à partir du template HTML
-
-#     response = HttpResponse(pdf, content_type='application/pdf')
-#     response['Content-Disposition'] = f'attachment; filename="recu_vente_{vente_id}.pdf"'
-#     return response
 def supprimer_vente(request, vente_id):
     vente = Vente.objects.get(id=vente_id)
     vente.delete()
     messages.success(request, 'La vente a été supprimée avec succès.')
     return redirect('ventes')
-
-# def get_product_details(request, product_id):
-#     product = Produit.objects.get(id=product_id)
-#     return JsonResponse({
-#         'id': product.id,
-#         'category': product.IdCategorie.nom,
-#         'price': product.PrixUnitaire
-#     })
 
 def get_product_details(request, product_id):
     try:

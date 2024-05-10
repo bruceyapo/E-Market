@@ -26,16 +26,12 @@
                 </li> -->
               </ul>
             </div>
-            <div class="col-md-auto ml-auto text-right">
-              <!-- <span class="small bg-white border py-1 px-2 rounded mr-2 d-none d-lg-inline">
-                <a href="#" class="text-muted"><i class="fe fe-x mx-1"></i></a>
-                <span class="text-muted">Status : <strong>Pending</strong></span>
-              </span> -->
-              <!-- <span class="small py-1 px-2 mr-2 d-none d-lg-inline">
-                <a href="{% url 'inscription_vendeur' %}" class="btn btn-success">Ajouter un Vendeur</a>
-              </span> -->
-              <button type="button" class="btn" data-toggle="modal" data-target=".modal-slide"><span class="fe fe-filter fe-16 text-muted"></span></button>
-              <button type="button" class="btn"><span class="fe fe-refresh-ccw fe-16 text-muted"></span></button>
+            <div class="row col-md-auto ml-auto text-right">
+              <div class="col-md-12">
+                <span class="small mr-2 d-lg-inline">
+                  <input type="search" id="searchInput" class="form-control" placeholder="Rechercher...">
+                </span>
+              </div>
             </div>
             
           </div>
@@ -359,6 +355,31 @@
     </div>
   </main> <!-- main -->
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const searchInput = document.getElementById("searchInput");
+      const rows = document.querySelectorAll("tbody tr");
+  
+      searchInput.addEventListener("input", function() {
+          const searchText = this.value.toLowerCase();
+          rows.forEach(function(row) {
+              const cells = row.querySelectorAll("td");
+              let found = false;
+              cells.forEach(function(cell) {
+                  const text = cell.textContent.toLowerCase();
+                  if (text.includes(searchText)) {
+                      found = true;
+                  }
+              });
+              if (found) {
+                  row.style.display = "";
+              } else {
+                  row.style.display = "none";
+              }
+          });
+      });
+  });
+  
+  
     /* defind global options */
     Chart.defaults.global.defaultFontFamily = base.defaultFontFamily;
     Chart.defaults.global.defaultFontColor = colors.mutedColor;

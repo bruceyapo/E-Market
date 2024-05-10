@@ -24,6 +24,8 @@ urlpatterns = [
     # path('get-all-products/', views.get_all_products, name='get_all_products'),
     
     path('get-client-details/<int:client_id>/', views.get_client_details, name='get_client_details'),
+    path('get-product-details/<int:product_id>/', views. get_product_details, name=' get-product-details'),
+    
     path('details_vente/<int:recu_id>/', views.details_vente, name='details_vente'),
     path('list_recu/', views.list_recu, name='list_recu'),
     
@@ -39,7 +41,7 @@ urlpatterns = [
     path('produit/<int:produit_id>/modifier/', views.modif_produit, name='modif_produit'),
     path('vendeur/<int:vendeur_id>/modifier/', views.modif_vendeur, name='modif_vendeur'),
     path('geststock/<int:geststock_id>/modifier/', views.modif_geststock, name='modif_geststock'),
-    path('get-product-details/<int:product_id>/', views.get_product_details, name='get_product_details'),
+    
     
     # authentification
     path('connexion/', views.connexion, name='connexion'),
