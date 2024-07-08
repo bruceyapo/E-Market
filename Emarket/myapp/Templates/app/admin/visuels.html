@@ -124,7 +124,7 @@
           </div>
         </div> <!-- end section -->
         <!-- widgets -->
-        <form method="GET" id="dateForm">
+        <form method="GET" id="dateForm" class="print-hidden"> 
           {% csrf_token %}
           <div class="row" style="width: 60%;">
               <div class="col-md-3">
@@ -239,7 +239,9 @@
             // Top 5 des meilleurs clients
             var topClientsLabels = [{% for client in top_clients %}"{{ client.IdClient__nom }} {{ client.IdClient__prenoms }}",{% endfor %}];
             var topClientsData = [{% for client in top_clients %}{{ client.total_purchases }},{% endfor %}];
-    
+            console.log(topClientsData);
+            console.log(topClientsLabels);
+        
             var topClientsCtx = document.getElementById('topClientsChart').getContext('2d');
             new Chart(topClientsCtx, {
                 type: 'bar',

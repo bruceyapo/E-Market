@@ -3,7 +3,7 @@ from django.urls import path
 from django.conf.urls.static import static
 from . import views
 urlpatterns = [
-    path("", views.accueiladmin, name='accueiladmin' ),
+    path("accueiladmin/", views.accueiladmin, name='accueiladmin' ),
     path("accueilvendeur/", views.accueilvendeur, name='accueilvendeur' ),
     path("accueilGestionnaireStock/", views.accueilGestionnaireStock, name='accueilGestionnaireStock' ),
     path("visuels/", views.visuels, name='visuels'),
@@ -44,7 +44,7 @@ urlpatterns = [
     
     
     # authentification
-    path('connexion/', views.connexion, name='connexion'),
+    path('', views.connexion, name='connexion'),
     path('deconnexion/', views.deconnexion, name='deconnexion'),
     path("inscription/Vendeur", views.inscription_vendeur, name='inscription_vendeur'),
     path("inscription/Admin", views.inscription_admin, name='inscription_admin'),
