@@ -23,6 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-b3lwagx35d$6)%7)@d*@xpi+n6l4+t32zb!wcbyr4xt^ld3y-j'
 
+COZE_API_KEY = 'pat_xA6DJHDXbgYKhEvLfO5ii1YAHV0zz3eXW0DqlwaOMiwQm9AibgSCqVdsK5VpQt37'
+COZE_API_URL = 'https://api.coze.com/v1'
+
+# api_key = 'VOTRE_CLE_API'
+# base_url = 'https://api.coze.com/v1'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -39,6 +45,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'myapp',
+    'authentifications',
+    'categorie',
+    'boutique',
+    'panier',
+    'commande',
 ]
 
 MIDDLEWARE = [
@@ -56,7 +67,7 @@ ROOT_URLCONF = 'Emarket.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -64,6 +75,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'categorie.context_processors.menu_links',
+                'panier.context_processors.counter',
             ],
         },
     },
@@ -78,7 +91,7 @@ WSGI_APPLICATION = 'Emarket.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',  # Use 'mssql' for mssql-django
-        'NAME': 'GestionVente',
+        'NAME': 'Emarket_app',
         'USER': 'Yapo2000',
         'PASSWORD': 'Yapo2000@',
         'HOST': 'DESKTOP-QQGKONI\\SQLEXPRESS',
@@ -109,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'myapp.Utilisateur'
+AUTH_USER_MODEL = 'authentifications.Utilisateur'
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -125,7 +138,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
+# STATIC_URL = 'static/'
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [
+    'Emarket/static',
+]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -133,7 +154,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTHENTICATION_BACKENDS = [
-    'myapp.backends.EmailAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
+# AUTHENTICATION_BACKENDS = [
+#     'myapp.backends.EmailAuthBackend',
+#     'django.contrib.auth.backends.ModelBackend',
+# ]

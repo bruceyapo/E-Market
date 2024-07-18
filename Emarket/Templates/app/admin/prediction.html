@@ -1,0 +1,110 @@
+{% extends "app/Partials/base_admin.html" %}
+{% load static %}
+{% block title %} Prédiction des Ventes {% endblock title %}
+
+{% block main-content %}
+
+<main role="main" class="main-content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <h1>Prédiction des Ventes</h1><br> <br>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <form method="post">
+                    {% csrf_token %}
+                    <!-- {{ form.as_p }} -->
+                    <div class="row" style="width: 60%;">
+                        <div class="col-md-4">
+                            {{ form.month.label_tag }}
+                            {{ form.month }}
+                        </div>   
+                        <div class="col-md-4">
+                            {{ form.year.label_tag }}
+                            {{ form.year }}
+                        </div>
+          
+                        <div class="col-md-4 mt-4">
+                          <button type="submit" class="btn btn-primary">Prédire meintenant</button>
+                        </div>
+                        <!-- <div class="col-md-3 mt-4">
+                          <a href="{% url 'visuels' %}" class="btn btn-secondary">Voir Tous</a>
+                        </div> -->
+                    </div>
+                    <!-- <button type="submit">Prédire</button> -->
+                </form>
+                <br> <br>
+                <h2 class="h3 mb-3 page-title">Prédictions de ventes pour {{ month_name }} {{ year }}</h2>
+                {% if not top_10_resultats.empty %}
+                <table class="table border table-hover bg-white">
+                    <thead>
+                        <tr role="row">
+                            <th>Produit</th>
+                            <th>Nombre de ventes prédites</th>
+                            <th>Chiffre d'affaires prévu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index, row in top_10_resultats.iterrows %}
+                            <tr>
+                                <td>{{ row.Produit }}</td>
+                                <td>{{ row.Nbre_de_ventes_predites }}</td>
+                                <td>{{ row.Chiffre_affaires_predit }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">Aucune prédiction réalisée.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table> <br> <br>
+                <h3>Graphique des Prédictions</h3>
+        <canvas id="predictionChart"></canvas>
+        <script>
+            var ctx = document.getElementById('predictionChart').getContext('2d');
+            var predictionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: {{ produits|safe }},
+                    datasets: [{
+                        label: 'Nombre de Ventes Prédites',
+                        data: {{ ventes|safe }},
+                        backgroundColor: 'rgba(54, 162, 235)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'Chiffre d\'Affaires Prévu',
+                        data: {{ ca|safe }},
+                        backgroundColor: 'rgba(75, 192, 192)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
+                {% else %}
+                    <p>Aucune prédiction disponible.</p>
+                {% endif %}
+            </div> 
+        </div>
+    </div>             
+                
+</main>
+
+
+<script>
+    // Attendre 7 secondes avant de masquer le message
+    setTimeout(function() {
+        var alertMessage = document.getElementById('alert-message');
+        if (alertMessage) {
+            alertMessage.style.display = 'none';
+        }
+    }, 5000); // 7000 millisecondes = 7 secondes
+</script>
+{% endblock main-content %}

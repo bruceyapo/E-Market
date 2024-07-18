@@ -1,0 +1,387 @@
+{% extends "app/Partials/base_admin.html" %}
+{% load static %}
+{% block title %} Mes visuels {% endblock title %}
+
+{% block main-content %}
+<main role="main" class="main-content">
+  <div class="container-fluid print-content">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <!-- <h2>Section title</h2> -->
+        <h2 class="h5 page-title">Tous les visuels</h2>
+        <div class="row">
+          <div class="col-md-5 col-xl-5 mb-4">
+            <div class="card shadow ">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-3 text-center">
+                    <span class="circle circle-sm bg-primary-light">
+                      <i class="fe fe-16 fe-shopping-bag text-white mb-0"></i>
+                    </span>
+                  </div>
+                  <div class="col pr-0">
+                    <p class="h3 mb-2">Ventes </p>
+                    <span class="h5 mb-2">Total: {{nombre_total_ventes}}</span><br>
+                    <p class="small mb-0">Vente jounalière</p>
+                    <span class="badge badge-pill badge-success">+{{pourc_ventes_par_jour}}%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-5 col-xl-4 mb-4">
+            <div class="card shadow">
+              <div class="card-body">
+                <div class="row align-items-center">
+            
+                  <div class="col">
+                    <p class="h3 mb-0">Meilleur Employée</p>
+                    <p class="h4 text-muted mb-0"></p>
+                    <div class="col align-items-center no-gutters">
+                      <div class="col-md-12 col-lg">
+                        <p> Nom: <strong class=""> {{ best_employee.IdVendeur__nom }} {{ best_employee.IdVendeur__prenoms }}</strong></p>
+                        <!-- <div class="progress progress-sm mt-2" style="height:3px">
+                          <div class="progress-bar bg-success" role="progressbar" style="width: 87%" aria-valuenow="87" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div> -->
+                      </div>
+                      <div class="col-auto">
+                        <span class="h5 mr-2 mb-0"> CA: {{ best_employee_sales }} Fcfa</span>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-xl-3 mb-4">
+            <div class="card shadow">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-3 text-center">
+                    <span class="circle circle-sm bg-primary">
+                      <i class="fe fe-16 fe-shopping-cart text-white mb-0"></i>
+                    </span>
+                  </div>
+                  <div class="col pr-0">
+                    
+                    <p class="h3 mb-0">Orders</p>
+                    <span class="h3 mb-0">1,869</span>
+                    <span class="small text-success">+16.5%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+         
+        </div> <!-- end section -->
+        <!-- info small box -->
+        <div class="row">
+          <div class="col-md-5 mb-4">
+            <div class="card shadow">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <span class="fe fe-32 fe-shopping-bag text-muted mb-0"></span>
+                  </div>
+                  <div class="col pr-0">
+                    <p class="h3 mb-0">Chiffre d'affaire</p>
+                    <span class="h5 mb-2">{{total_chiffre_affaires}} Fcfa</span>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-4">
+            <div class="card shadow">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <span class="circle circle-sm bg-primary">
+                      <i class="fe fe-16 fe-shopping-cart text-white mb-0"></i>
+                    </span>
+                    <!-- <span class="fe fe-32 fe-clipboard text-muted mb-0"></span> -->
+                  </div>
+                  <div class="col">
+                    <p class="h3 mb-0">Commandes</p>
+                    <span class="h4 mb-0">{{orders_count}}</span>
+                    <p class="small text-muted mb-0">Commandes</p>
+                    <span class="badge badge-pill badge-success">+16.5%</span>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card shadow">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-auto">
+                    <span class="fe fe-32 fe-users text-muted mb-0"></span>
+                  </div>
+                  <div class="col">
+                    <span class="h3 mb-0">Clients</span>
+                    <p class="small  mb-0">Total : {{nombre_total_client}} </p>
+                    <!-- <span class="badge badge-pill badge-warning"></span> -->
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> <!-- end section -->
+        <!-- widgets -->
+        <form method="GET" id="dateForm" class="print-hidden"> 
+          {% csrf_token %}
+          <div class="row" style="width: 60%;">
+              <div class="col-md-3">
+                  {{ date_form.month.label_tag }}
+                  {{ date_form.month }}
+              </div>   
+              <div class="col-md-3">
+                  {{ date_form.year.label_tag }}
+                  {{ date_form.year }}
+              </div>
+
+              <div class="col-md-3 mt-4">
+                <button type="submit" class="btn btn-primary">Valider</button>
+              </div>
+              <div class="col-md-3 mt-4">
+                <a href="{% url 'visuels' %}" class="btn btn-secondary">Voir Tous</a>
+              </div>
+          </div>
+        </form>
+       <br><br>
+        <div>
+          <h2>Indicateurs de performance</h2>
+          <div class="row">
+            <canvas id="salesByDateChart" width="600" height="300"></canvas>
+            <canvas id="myChart" width="600" height="300"></canvas>
+            <div class="col-md-6">
+              <!-- Nombre total de ventes par mois -->
+             
+            </div>
+            <div class="col-md-6">
+              <!-- Chiffre d'affaires par mois -->
+               
+            </div>
+          </div>
+          <br><br>
+          <div class="row">
+            <!-- Top 5 des meilleurs Produit -->
+            <div class="col-md-6">
+              <h4>Top 5 meilleurs Produit</h4>
+              <canvas id="bestProductChart" width="400" height="350"></canvas>
+            </div>
+            <!-- Top 5 des meilleurs clients -->
+            <div class="col-md-6">
+              <h4>5 meilleurs client</h4>
+              <canvas id="topClientsChart" width="400" height="350"></canvas>
+            </div>
+          </div>
+          
+          <!-- Meilleur employé -->
+          <canvas id="bestEmployeeChart" width="400" height="200"></canvas>
+
+          <div class="col-lg-12 col-md-12 col-12 mx-auto text-center shadow bg-white px-5 py-3 rounded print-hidden">
+
+            <button onclick="window.print()" class="btn btn-info btn-end">Imprimer</button>
+        </div>
+      </div>
+      
+        
+      </div>
+    </div> 
+  </div> 
+</main> <!-- main -->
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+                // Meilleur produit vendu
+    var topProduitLabels = [{% for produit in top_5_products %} "{{ produit.IdProduit__Nom }}",{% endfor %}];
+    var topProduitData = [{% for produit in top_5_products %}{{ produit.total_sold }},{% endfor %}];
+    var bestProductCtx = document.getElementById('bestProductChart').getContext('2d');
+    new Chart(bestProductCtx, {
+        type: 'pie', // Changer le type de graphique en "pie"
+        data: {
+            labels: topProduitLabels,
+            datasets: [{
+                label: 'Quantité vendue',
+                data: topProduitData,
+                backgroundColor: [
+                    '#FF6384',
+                    '#36A2EB',
+                    '#FFCE56',
+                    '#9BD0F5',
+                    '#4BC0C0'
+                ],
+                borderColor: '#fff',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw;
+                        }
+                    }
+                }
+            }
+        }
+    });
+            // Meilleur employé
+            var bestEmployeeCtx = document.getElementById('bestEmployeeChart').getContext('2d');
+            new Chart(bestEmployeeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ["{{ best_employee.IdVendeur__nom }} {{ best_employee.IdVendeur__prenoms }}"],
+                    datasets: [{
+                        label: 'Meileur Vendeur',
+                        data: [{{ best_employee.total_sales }}],
+                        backgroundColor: '#FF6384',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+                
+            });
+    
+            // Top 5 des meilleurs clients
+            var topClientsLabels = [{% for client in top_clients %}"{{ client.IdClient__nom }} {{ client.IdClient__prenoms }}",{% endfor %}];
+            var topClientsData = [{% for client in top_clients %}{{ client.total_purchases }},{% endfor %}];
+        
+            var topClientsCtx = document.getElementById('topClientsChart').getContext('2d');
+            new Chart(topClientsCtx, {
+                type: 'bar',
+                data: {
+                    labels: topClientsLabels,
+                    datasets: [{
+                        label: 'Nombre d\'achats',
+                        data: topClientsData,
+                        backgroundColor: '#9BD0F5',
+                        
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                  indexAxis: 'y',
+                
+                }
+            });
+        });
+    
+
+        document.addEventListener('DOMContentLoaded', () => {
+          // Nombre total de ventes par mois
+          var salesByDateCtx = document.getElementById('salesByDateChart').getContext('2d');
+          new Chart(salesByDateCtx, {
+              type: 'line',
+              data: {
+                  labels: {{ years_months|safe }},
+                  datasets: [{
+                      label: 'Nombre total de ventes par mois',
+                      data: {{ total_sales|safe }},
+                      fill: true,
+                      borderColor: 'rgb(75, 192, 192)',
+                      borderWidth: 2
+                  }]
+              },
+              options: {
+                  scales: {
+                      y: {
+                          beginAtZero: true
+                      }
+                  }
+              }
+          });
+
+          var ctx = document.getElementById('myChart').getContext('2d');
+          var myChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: {{ labels|safe }},
+                  datasets: [{
+                      label: 'Chiffre d\'affaires par mois',
+                      data: {{ data|safe }},
+                      backgroundColor: 'rgb(75, 192, 192)',
+                      borderColor: 'rgba(75, 192, 192, 1)',
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  scales: {
+                      
+                      y: {
+                          beginAtZero: true
+                          
+                      }
+                  }
+              }
+          });
+  
+      });
+      
+    </script>
+    
+  <script>
+    /* defind global options */
+    Chart.defaults.global.defaultFontFamily = base.defaultFontFamily;
+    Chart.defaults.global.defaultFontColor = colors.mutedColor;
+  </script>
+  <script src="{% static 'app/js/gauge.min.js' %}"></script>
+    <script src="{% static 'app/js/jquery.sparkline.min.js' %}"></script>
+    <script src="{% static 'app/js/apexcharts.min.js' %}"></script>
+    <script src="{% static 'app/js/apexcharts.custom.js' %}"></script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-56159088-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+
+      function gtag()
+      {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'UA-56159088-1');
+    </script>
+
+    <style>
+      @media print {
+          .print-hidden {
+              display: none;
+          }
+      }
+  
+      @media print {
+          body * {
+              visibility: hidden;
+          }
+          .print-content, .print-content * {
+              visibility: visible;
+          }
+          .print-content {
+              position: absolute;
+              left: 0;
+              top: 0;
+          }
+      }
+  </style>
+{% endblock main-content %}

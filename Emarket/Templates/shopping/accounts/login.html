@@ -1,0 +1,52 @@
+{% extends 'shopping/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<!-- ========================= SECTION CONTENT ========================= -->
+    <section class="section-conten padding-y" style="min-height:84vh">
+    <!-- ============================ COMPONENT LOGIN   ================================= -->
+        <div class="card mx-auto" style="max-width: 380px;">
+          <div class="card-body shadow">
+                {% if messages %}
+                {% for msg in messages %}
+                    <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
+                {% endfor %}
+                {% endif %}
+                <br>
+                <h1 class="h1 logo text-center mb-4" style="color: #7A7A7A;"><span style="color: #3166EB;">E-</span>Market</h1>
+                <h4 class="card-title mb-4 text-center">Sign in</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <!--  -->
+                        {{ form.as_p }}
+                    <div class="form-group">
+                        <a href="#" class="float-right">Forgot password?</a> 
+                    
+                    </div> 
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block"> Login  </button>
+                        <p class="mt-5 mb-3 text-muted text-center">© 2024</p>
+                    </div>   
+                </form>
+         
+            </div> <!-- card-body.// -->
+        </div> <!-- card .// -->
+    
+         <p class="text-center mt-4">Don't have account? <a href="{% url 'inscription_Client' %}">Sign up</a></p>
+         <br><br>
+    <!-- ============================ COMPONENT LOGIN  END.// ================================= -->
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+    <script>
+        // Attendre 7 secondes avant de masquer le message
+        setTimeout(function() {
+            var alertMessage = document.getElementById('alert-message');
+            if (alertMessage) {
+                alertMessage.style.display = 'none';
+            }
+        }, 5000); // 7000 millisecondes = 7 secondes
+    </script>
+{% endblock content %}

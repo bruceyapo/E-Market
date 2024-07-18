@@ -1,0 +1,114 @@
+
+{% extends 'shopping/base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+    <div class="container">
+        <div class="row">
+        {% include 'shopping/include/dashboard_sidbar.html' %}
+        <main class="col-md-9">
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3"> Edit Your Profile </strong>
+            </header>
+            <div class="card-body">
+                {% if messages %}
+                    {% for msg in messages %}
+                        <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
+                    {% endfor %}
+                {% endif %}
+                <br>
+                <div class="row">
+                    <div class="mb-4 row">
+                        {% if userprofile.profile_picture %}
+                                                
+                        <div class="col-md-12" width="200">
+                            <img src="{{ userprofile.profile_picture.url }}" width="200" alt="Profile picture" class="img-fluid img-thumbnail shadow">
+                        </div>
+                    
+                    {% else %}
+                    
+                    <div class="col-md-12" width="200">
+                        <img src="{% static 'app/img/default_profil.png' %}" width="200" alt="Profile picture" class="img-fluid img-thumbnail shadow">
+                    </div>
+                    
+                    {% endif %}
+                        <!-- <h5>Personal Information</h5> -->
+                        
+                    </div>
+                    <br>
+                    <div class="col-md-12">
+                        <form action="{% url 'edit_profile' %}" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="first_name">First Name</label>
+                                    {{ user_form.nom }}
+                                    
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="last_name">Last Name</label>
+                                    {{ user_form.prenoms }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="phone">Phone</label>
+                                    {{ user_form.telephone }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="profile_picture">Profile picture</label>
+                                    {{ profile_form.profile_picture }}
+                                </div>
+                            </div>
+                                
+                            <div class="form-group">
+                                <label for="address_line_1">Address line 1</label>
+                                {{ profile_form.address_line_1 }}
+                            </div>
+                            <div class="form-group">
+                                <label for="address_line_2">Address line 2</label>
+                                {{ profile_form.address_line_2 }}
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="city">City</label>
+                                    {{ profile_form.city }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="State">State</label>
+                                    {{ profile_form.state }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="Country">Country</label>
+                                    {{ profile_form.country }}
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </div> <!-- row.// -->
+                </div> <!-- card-body .// -->
+            </div>
+        </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+    <script>
+        // Attendre 7 secondes avant de masquer le message
+        setTimeout(function() {
+            var alertMessage = document.getElementById('alert-message');
+            if (alertMessage) {
+                alertMessage.style.display = 'none';
+            }
+        }, 5000); // 7000 millisecondes = 7 secondes
+    </script>
+    
+{% endblock content %}

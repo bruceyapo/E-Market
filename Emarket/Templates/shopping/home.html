@@ -1,0 +1,165 @@
+{% extends 'shopping/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<!-- ========================= SECTION MAIN ========================= -->
+<section class="section-intro padding-y-sm">
+<div class="container-fluid">
+
+<div class="intro-banner-wrap" style="height: 350px;">
+	<img src="{% static 'images/banners/slide3.jpg' %}" class="img-fluid rounded" style="height: 100%; width:100%; object-fit: cover;">
+  
+</div>
+
+</div> <!-- container //  -->
+</section>
+<!-- ========================= SECTION MAIN END// ========================= -->
+
+<!-- ========================= SECTION  ========================= -->
+<section class="section-name padding-y-sm">
+<div class="container">
+
+<header class="section-heading">
+	<a href="" class="btn btn-outline-primary float-right">Voir Tout</a>
+	<h3 class="section-title">Produits populaires</h3>
+</header><!-- sect-heading -->
+
+<div class="row mb-3">
+	<div class="col-md-12">
+		{% if messages %}
+		{% for msg in messages %}
+			<p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
+		{% endfor %}
+	{% endif %}
+	</div>
+</div>
+<div class="row">
+	{% for product in products %}
+	<div class="col-md-3">
+		<div class="card card-product-grid">
+			{% if product.image %}
+				<a href="{{ product.get_url }}"><img src="{{product.image.url}}"></a>
+			{% else %}
+				<a href="{{ product.get_url }}"><img src="{% static 'images/aliment.jpeg' %}"></a>
+			{% endif %}
+			<figcaption class="info-wrap">
+				<a href="{{ product.get_url }}" class="title">{{ product.Nom}}</a>
+				<div class="price mt-1">{{ product.PrixUnitaire}}</div> <!-- price-wrap.// -->
+			</figcaption>
+		</div>
+	</div> <!-- col.// -->
+	{% endfor %}
+</div> <!-- row.// -->
+<nav class="mt-4" aria-label="Page navigation sample">
+	{% if products.has_other_pages %}
+		<ul class="pagination">
+			{% if products.has_previous %}
+				<li class="page-item"><a class="page-link" href="?page={{ products.previous_page_number }}">Previous</a></li>
+			{% else %}
+				<li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
+			{% endif %}
+			{% with current=products.number first_page=1 last_page=products.paginator.num_pages %}
+                {% with prev=products.number|add:"-1" next=products.number|add:"1" %}
+                  {% if current > 2 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"-2" > first_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if prev >= first_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ prev }}">{{ prev }}</a></li>
+                  {% endif %}
+                  
+                  <li class="page-item active"><span class="page-link">{{ current }}</span></li>
+                  
+                  {% if next <= last_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ next }}">{{ next }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"2" < last_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if current < last_page|add:"-1" %}
+                    <li class="page-item"><a class="page-link" href="?page={{ last_page }}">{{ last_page }}</a></li>
+                  {% endif %}
+                {% endwith %}
+              {% endwith %}
+			
+			{% if products.has_next %}
+				<li class="page-item"><a class="page-link" href="?page={{ products.next_page_number }}">Next</a></li>
+				{% else %}
+				<li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+			{% endif %}
+		</ul>
+	{% endif %}
+</nav>
+
+<!-- <nav class="mt-4" aria-label="Page navigation ">
+    {% if products.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ products.previous_page_number }}" aria-label="Précédente">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+    {% endif %}
+              
+              {% with current=products.number first_page=1 last_page=products.paginator.num_pages %}
+                {% with prev=products.number|add:"-1" next=products.number|add:"1" %}
+                  {% if current > 2 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"-2" > first_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if prev >= first_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ prev }}">{{ prev }}</a></li>
+                  {% endif %}
+                  
+                  <li class="page-item active"><span class="page-link">{{ current }}</span></li>
+                  
+                  {% if next <= last_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ next }}">{{ next }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"2" < last_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if current < last_page|add:"-1" %}
+                    <li class="page-item"><a class="page-link" href="?page={{ last_page }}">{{ last_page }}</a></li>
+                  {% endif %}
+                {% endwith %}
+              {% endwith %}
+              
+              {% if products.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ products.next_page_number }}" aria-label="Suivante">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+</nav> -->
+
+</div><!-- container // -->
+</section>
+<!-- ========================= SECTION  END// ========================= -->
+
+<script>
+    // Attendre 7 secondes avant de masquer le message
+    setTimeout(function() {
+        var alertMessage = document.getElementById('alert-message');
+        if (alertMessage) {
+            alertMessage.style.display = 'none';
+        }
+    }, 5000); // 7000 millisecondes = 7 secondes
+</script>
+{% endblock content %}
+
+
+

@@ -1,0 +1,198 @@
+{% extends "app/Partials/base_vendeur.html" %}
+{% load static %}
+{% block title %} Ventes {% endblock title %}
+
+{% block main-content %}
+<div class="row align-items-center h-100">
+    <div class="col-lg-6 col-md-4 col-10 mx-auto text-center shadow bg-white px-5 py-3 rounded">
+        <form id="search-client-form">
+            <div class="form-group">
+                <label for="client_id">Code Client</label>
+                <input type="number" min="1" class="form-control" id="client_id" placeholder="Veuillez entrer le code du client.">
+            </div>
+            <button type="button" id="search-client-btn" class="btn btn-primary">Vérifier</button>
+        </form>
+        <form method="post">
+            {% if messages %}
+                {% for msg in messages %}
+                    <p id="alert-message" class="alert alert-{{msg.tags}}" role="alert"> {{msg}} </p>
+                {% endfor %}
+              {% endif %}
+            <!-- Montant total -->
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <h4>Montant Total: <span id="montant-total"></span></h4>
+                </div>
+            </div>
+    
+            {% csrf_token %}
+    
+            <!-- Informations du client -->
+            <div class="row">
+                <div class="col-md-4">
+                    <h2>Client</h2>
+                    <div class="form-group">
+                        {{ client_form.nom.label_tag }}
+                        {{ client_form.nom }}
+                    </div>
+                    <div class="form-group">
+                        {{ client_form.prenoms.label_tag }}
+                        {{ client_form.prenoms.errors }}
+                        {{ client_form.prenoms }}
+                    </div>
+                    <div class="form-group">
+                        {{ client_form.genre.label_tag }}
+                        {{ client_form.genre.errors }}
+                        {{ client_form.genre }}
+                    </div>
+                </div>
+    
+                <!-- Liste des produits -->
+                <div class="col-md-8 table-responsive" style="height: 300px;">
+                    <h2>Produits</h2>
+                    {{ produit_formset.management_form }}
+                    <div id="formset-container">
+                        {% for form in produit_formset %}
+                            <div class="formset-row">
+                                {{ form.IdProduit.label_tag }}
+                                {{ form.IdProduit }}
+                                <br>
+                                {{ form.QuantiteVendu.label_tag }}
+                                {{ form.QuantiteVendu }} <br>
+                            </div>
+                            {% endfor %}
+                    </div>
+                </div>
+                <span class="text-danger" id="stock-message"></span>  <!-- Affichage du message d'erreur -->
+    
+            </div>
+    
+            <!-- Boutons -->
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <a href="{% url 'ventes' %}" class="btn btn-danger">Retour</a>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn  btn-primary">Enregistrer</button>
+                </div>
+                <div class="col-md-5">
+                    <button type="button" id="add-form" class="btn  btn-secondary">Ajouter un produit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+</div>
+<br>
+
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+   
+    $(document).ready(function() {
+        function updateTotalAmount() {
+            var total = 0;
+            var stockMessage = "";
+            
+            $('.formset-row').each(function() {
+                var productId = $(this).find('.IdProduit').val();
+                var quantity = $(this).find('.QuantiteVendu').val();
+                
+                if (productId && quantity) {
+                    fetch(`/Administration/get-product-details/${productId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        var subtotal = data.price * quantity;
+                        total += subtotal;
+                        $('#montant-total').text(total.toFixed(2) + ' FCFA'); // Mise à jour du montant total
+    
+                        // Vérification du stock
+                        if (data.stock < quantity) {
+                            stockMessage = `La quantité en stock (${data.stock} unités) du produit (${data.nom}) est insuffisante pour la vente.`;
+                        } else if (data.stock - quantity < 0) {
+                            stockMessage = "La quantité en stock ne peut pas être négative après la vente.";
+                        } else {
+                            stockMessage = "";
+                        }
+                        console.log("message",stockMessage)
+                        $('#stock-message').text(stockMessage); // Affichage du message d'erreur
+                    })
+                    .catch(error => console.log(error));
+                }
+            });
+        }
+    
+        // Assurez-vous que ces sélecteurs correspondent aux champs de produit et de quantité
+        $(document).on('change', '.IdProduit, .QuantiteVendu', updateTotalAmount);
+        $(document).on('keyup', '.QuantiteVendu', updateTotalAmount);
+    
+
+        // Afficher le montant total lors du chargement de la page
+        updateTotalAmount();
+
+        // Code pour ajouter un nouveau formulaire produit
+        $('#add-form').click(function() {
+            var formIndex = $('#id_vente_set-TOTAL_FORMS').val();
+            $('#formset-container').append($('#formset-container .formset-row:first').clone());
+            $('#formset-container .formset-row:last :input').each(function() {
+                var name = $(this).attr('name').replace('-0-', '-' + formIndex + '-');
+                var id = 'id_' + name;
+                $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+            });
+            $('#id_vente_set-TOTAL_FORMS').val(parseInt(formIndex) + 1);
+            
+            // Mettre à jour le montant total après avoir ajouté un nouveau formulaire
+            updateTotalAmount();
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        // Fonction pour rechercher un client par son ID
+        function searchClientById(clientId) {
+            fetch(`/Administration/get-client-details/${clientId}/`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                    return;
+                }
+    
+                // Remplir les champs du formulaire client avec les détails récupérés
+                $('#id_nom').val(data.nom);
+                $('#id_prenoms').val(data.prenoms);
+                $('#id_genre').val(data.genre);
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                alert('Une erreur s\'est produite. Veuillez vérifier la console pour plus de détails.');
+            });
+        }
+    
+        // Écouteur d'événement pour le bouton de recherche client
+        $('#search-client-btn').click(function() {
+            const clientId = $('#client_id').val();
+            if (clientId) {
+                searchClientById(clientId);
+            } else {
+                alert('Veuillez entrer le code du client.');
+            }
+        });
+    });
+    
+</script>
+<script>
+    // Attendre 7 secondes avant de masquer le message
+    setTimeout(function() {
+        var alertMessage = document.getElementById('alert-message');
+        if (alertMessage) {
+            alertMessage.style.display = 'none';
+        }
+    }, 5000); // 7000 millisecondes = 7 secondes
+</script>
+{% endblock main-content %}

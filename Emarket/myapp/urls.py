@@ -3,10 +3,9 @@ from django.urls import path
 from django.conf.urls.static import static
 from . import views
 urlpatterns = [
-    path("accueiladmin/", views.accueiladmin, name='accueiladmin' ),
-    path("accueilvendeur/", views.accueilvendeur, name='accueilvendeur' ),
-    path("accueilGestionnaireStock/", views.accueilGestionnaireStock, name='accueilGestionnaireStock' ),
+    
     path("visuels/", views.visuels, name='visuels'),
+    path("prediction/", views.prediction, name='prediction'),
     path("calendier_admin/", views.calendier_admin, name='calendier_admin'),
     path("calendier_vendeur/", views.calendier_vendeur, name='calendier_vendeur'),
     path("calendier_gestionnaireStock/", views.calendier_gestionnaireStock, name='calendier_gestionnaireStock'),
@@ -23,11 +22,15 @@ urlpatterns = [
     path('get_quantite/<int:produitId>/', views.get_quantite, name='get_quantite'),
     # path('get-all-products/', views.get_all_products, name='get_all_products'),
     
+    # path('get-client-details/<int:client_id>/', views.get_client_details, name='get_client_details'),
     path('get-client-details/<int:client_id>/', views.get_client_details, name='get_client_details'),
     path('get-product-details/<int:product_id>/', views. get_product_details, name=' get-product-details'),
     
     path('details_vente/<int:recu_id>/', views.details_vente, name='details_vente'),
     path('list_recu/', views.list_recu, name='list_recu'),
+    path('list_commande/', views.list_commande, name='list_commande'),
+    path('detail_commande/<int:order_id>', views.detail_commande, name='detail_commande'),
+    # path('valider_commande/<int:order_id>', views.valider_commande, name='valider_commande'),
     
     path('notifications/mark-as-read/<int:notification_id>/', views.mark_notification_as_read, name='mark_notification_as_read'),
     path('vente/create/', views.ajout_vente, name='ajout_vente'),
@@ -44,13 +47,5 @@ urlpatterns = [
     
     
     # authentification
-    path('', views.connexion, name='connexion'),
-    path('deconnexion/', views.deconnexion, name='deconnexion'),
-    path("inscription/Vendeur", views.inscription_vendeur, name='inscription_vendeur'),
-    path("inscription/Admin", views.inscription_admin, name='inscription_admin'),
-    path("inscription/GestionnaireStock", views.inscription_GestionnaireStock, name='inscription_GestionnaireStock'),
     
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL,
-    document_root=settings.MEDIA_ROOT)

@@ -1,7 +1,9 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
-from .models import Notification, Vente, Stock
+
+from boutique.models import Stock
+from .models import Notification, Vente
 
 @receiver(post_save, sender=Vente)
 def update_stock(sender, instance, **kwargs):
@@ -12,7 +14,7 @@ def update_stock(sender, instance, **kwargs):
         produit = instance.IdProduit
         produit_stock, created = Stock.objects.get_or_create(IdProduit=produit)
         # Mettez à jour la quantité en stock
-        produit_stock.QuantiteStock -= instance.QuantiteVendu
+        produit_stock.QuantiteStock = produit_stock.QuantiteStock-instance.QuantiteVendu
         produit_stock.save()
 
         if produit_stock.QuantiteStock < 250:

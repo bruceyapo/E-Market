@@ -1,0 +1,61 @@
+
+{% extends 'shopping/base.html' %}
+
+{% load static %}
+
+{% block content %}
+    <!-- ========================= SECTION CONTENT ========================= -->
+<section class="section-conten padding-y bg">
+
+    <div class="container">
+        <div class="row">
+        {% include 'shopping/include/dashboard_sidbar.html' %}
+        <main class="col-md-9">
+            <article class="card">
+            <header class="card-header">
+                <strong class="d-inline-block mr-3">Your orders history </strong>
+            </header>
+            <div class="card-body">
+                <div class="row"> 
+                    <div class="col-md-12">
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <th scope="col">ID Commande</th>
+                                <th scope="col">Nom de facturation</th>
+                                <th scope="col">Téléphone</th>
+                                <th scope="col">Prix Total</th>
+                                <th scope="col">Date</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                    <tr>
+                                        <th scope="row"> <a href="{% url 'orders_detail' order.order_number %}">{{order.order_number}}</a></th>
+                                        <td>{{order.full_name}}</td>
+                                        <td>{{order.phone}}</td>
+                                        <td>{{order.order_total}}</td>
+                                        <td>{{order.created_at}}</td>
+                                    </tr>
+                                    {% empty %}
+                                     <tr>
+                                        <td colspan="6" class="text-center">Vous n'avez aucune commande</td>
+                                    </tr>
+                                {% endfor %}
+
+                              
+                            </tbody>
+                          </table>
+                    </div> <!-- row.// -->
+                </div> <!-- card-body .// -->
+            </div>
+        </article> <!-- order-group.// --> 
+        </main>
+    </div> <!-- row.// -->
+    </div>
+    
+    
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+    
+{% endblock content %}

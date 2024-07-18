@@ -1,0 +1,121 @@
+{% extends "app/Partials/base_vendeur.html" %}
+
+{% load static %}
+
+{% block title %} Détails commande {% endblock title %}
+
+{% block main-content %}
+<div class="container shadow bg-white rounded" style="margin: 0 auto;width: 60%;padding: 50px;margin-top: 50px;margin-bottom: 50px;">
+    <div class="row invoice row-printable">
+        <div class="col-md-12">
+            <!-- col-lg-12 start here -->
+            <div class="panel panel-default plain" id="dash_0">
+                <!-- Start .panel -->
+                <div class="panel-body p30">
+                    <div class="row">
+                        <!-- Start .row -->
+                        <div class="col-lg-6">
+                            <!-- col-lg-6 start here -->
+                            <div class="invoice-logo"><img src="{% static './images/Logo_emarket2.png' %}" alt="Invoice logo" style="max-height: 40px;"></div>
+                        </div>
+                        <!-- col-lg-6 end here -->
+                        <div class="col-lg-6">
+                            <!-- col-lg-6 start here -->
+                            <div class="invoice-from">
+                                <ul class="list-unstyled text-right">
+                                    <li><strong>Facturé à</strong></li>
+                                    <li> {{order.full_name}} </li>
+                                    <li> {{order.full_address}}</li>
+                                    <li> {{order.city}},  {{order.state}}</li>
+                                    <li> {{order.country}}</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- col-lg-6 end here -->
+                        <div class="col-lg-12">
+                            <!-- col-lg-12 start here -->
+                            <div class="invoice-details mt25">
+                                <div class="well">
+                                    <ul class="list-unstyled mb0">
+                                        <li><strong>Order</strong> # {{order.order_number}} </li>
+                                        <li><strong>Transaction ID </strong> {{order.payment.payment_id}} </li>
+                                        <li><strong>Order Date:</strong> {{order.created_at}} </li>
+                                        <li><strong>Status:</strong> {{order.payment.status}} </li>
+                                    </ul>
+                                </div>
+                            </div>
+                           
+                            <div class="invoice-items">
+                                <div class="table-responsive" style="overflow: hidden; outline: none;" tabindex="0">
+                                    <table class="table border table-hover bg-white">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Product</th>
+                                                <th class="text-center">Qty</th>
+                                                <th class="text-center">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                             {% for item in orders_detail %}
+                                            <tr>
+                                                <td> {{item.product.Nom}}</td>
+                                                <td class="text-center"> {{item.quantity}} </td>
+                                                <td class="text-center"> {{item.product_price}} FCFA</td>
+                                            </tr>
+                                            {%endfor%}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="2" class="text-right">Sous-Total:</th>
+                                                <th class="text-center">{{subTotal}} FCFA</th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="2" class="text-right">Taxe:</th>
+                                                <th class="text-center">{{order.tax}} FCFA</th>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <th colspan="2" class="text-right">Total:</th>
+                                                <th class="text-center">{{order.order_total}} FCFA</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="invoice-footer mt25">
+
+                                <form action="{% url 'detail_commande' order.order_number %}" method="post">
+                                     {% csrf_token %}
+                                     <input type="hidden" name="order_id" value="{{ order.id }}">
+                                     <input type="hidden" name="user" value="{{ order.user.id }}">
+                                     <input type="hidden" name="status" value="Complet">
+                                     <br>
+                                     {% for item in orders_detail %}
+                                     <input type="hidden" name="products" value="{{item.product.id}}">
+                                     <input type="hidden" name="quantities" value="{{item.quantity}}">
+                                     <input type="hidden" name="prices" value="{{item.product_price}}">
+                                     <input type="hidden" name="total_prices" value="{{item.total_prices}}">
+                                     {% endfor %}
+                                     {% if order.status == "Complet" %}
+                                     <a href="{% url 'list_commande' %}" class="btn btn-secondary"> Retour</a>
+                                        <h3 class="left"> Commande Complet</h3>
+                                     {% else %}
+                                     <button type="submit" class="btn btn-success">Valider</button>
+                                
+                                     {% endif %}
+                                </form>
+                                
+                            </div>
+                        </div>
+                        <!-- col-lg-12 end here -->
+                    </div>
+                    <!-- End .row -->
+                </div>
+            </div>
+            <!-- End .panel -->
+        </div>
+        <!-- col-lg-12 end here -->
+    </div>
+    </div>
+
+{% endblock %}

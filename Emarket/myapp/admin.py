@@ -1,24 +1,20 @@
 from django.contrib import admin
 
-from myapp.models import CategorieProduit, Utilisateur, Vendeur, client, Adminitrateur
+from myapp.models import Notification, Recu, Vente
 
-# Register your models here.
-class clientModelAdmin(admin.ModelAdmin):
-    list_display = ('id','nom', 'prenoms','genre', 'ville', 'telephone')
-admin.site.register(client, clientModelAdmin)
+# from myapp.models import CategorieProduit, Utilisateur, Vendeur, client, Adminitrateur
 
-class AdminitrateurModelAdmin(admin.ModelAdmin):
-    list_display = ('id','nom','prenoms', 'telephone', 'image', 'IdUtilisateur')
-admin.site.register(Adminitrateur, AdminitrateurModelAdmin)
+# # Register your models here.
 
-class UtilisateurModelAdmin(admin.ModelAdmin):
-    list_display = ('id','email','password', 'roles')
-admin.site.register(Utilisateur, UtilisateurModelAdmin)
 
-class VendeurModelAdmin(admin.ModelAdmin):
-    list_display = ('id','nom', 'prenoms', 'ville', 'telephone', 'image', 'IdUtilisateur')
-admin.site.register(Vendeur, VendeurModelAdmin)
 
-class CategorieProduitdModelAdmin(admin.ModelAdmin):
-    list_display = ('id','nom')
-admin.site.register(CategorieProduit, CategorieProduitdModelAdmin)
+
+
+
+
+
+# class CategorieProduitdModelAdmin(admin.ModelAdmin):
+#     list_display = ('id','nom')
+admin.site.register(Vente)
+admin.site.register(Notification)
+admin.site.register(Recu)

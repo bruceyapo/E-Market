@@ -1,0 +1,142 @@
+
+{% extends "app/Partials/base_vendeur.html" %}
+{% load static %}
+{% block title %} Commandes {% endblock title %}
+
+{% block main-content %}
+<div class="col align-items-center mx-auto h-100" style="width: 85%; margin-left: 280px; padding: 0 90px !important;">
+    <div class="col-lg-12 col-md-12 col-12 shadow bg-white px-5 py-3 rounded print-content" style="padding: 15px 70px !important;">
+        <h2 class="ml-3">Liste des commandes</h2>
+        <div class="row mb-4 items-align-center">
+          <div class="col-md">
+            <ul class="nav nav-pills justify-content-start">
+              <li class="nav-item">
+                <a class="nav-link active bg-transparent pr-2 pl-0 text-primary" href="#">Nombre Total de commande  <span class="badge badge-pill bg-primary text-white ml-2">{{nombre_total_commande}}</span></a>
+              </li>
+            </ul>
+          </div>
+        
+          
+        </div>
+        <input type="search" id="searchInput" class="form-control" placeholder="Rechercher...">
+        <br><br>
+        <table class="table border table-hover bg-white">
+            <thead>
+              <tr role="row">
+                <th>ID Commande</th>
+                <th>Nom de facturation</th>
+                <th>Téléphone</th>
+                <th>Montant Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in orders %}
+                  <tr>
+                    <th scope="row"> <a href="{% url 'detail_commande' order.order_number %}">{{order.order_number}}</a></th>
+                    <td>{{order.full_name}}</td>
+                    <td>{{order.phone}}</td>
+                    <td>{{order.order_total}}</td>
+                    {% if order.status == "Complet" %}
+                          <td class="text-success">{{order.status}}</td>
+                    {% else %}
+                        <td class="text-danger">{{order.status}}</td>
+                     {% endif %}
+                    
+                    <td>{{order.created_at}}</td>
+                    <td>
+                      <a href="{% url 'detail_commande' order.order_number %}" class="btn btn-outline-secondary">Détails</a>
+                    </td>
+                  </tr>
+                {% empty %}
+                  <tr>
+                      <td colspan="6" class="text-center">Aucune commande</td>
+                  </tr>
+              {% endfor %}  
+            </tbody>
+          </table>
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-end mb-0">
+              {% if orders.has_previous %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ orders.previous_page_number }}" aria-label="Précédente">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+              
+              {% with current=orders.number first_page=1 last_page=orders.paginator.num_pages %}
+                {% with prev=orders.number|add:"-1" next=orders.number|add:"1" %}
+                  {% if current > 2 %}
+                    <li class="page-item"><a class="page-link" href="?page={{ first_page }}">{{ first_page }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"-2" > first_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if prev >= first_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ prev }}">{{ prev }}</a></li>
+                  {% endif %}
+                  
+                  <li class="page-item active"><span class="page-link">{{ current }}</span></li>
+                  
+                  {% if next <= last_page %}
+                    <li class="page-item"><a class="page-link" href="?page={{ next }}">{{ next }}</a></li>
+                  {% endif %}
+                  
+                  {% if current|add:"2" < last_page %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                  {% endif %}
+                  
+                  {% if current < last_page|add:"-1" %}
+                    <li class="page-item"><a class="page-link" href="?page={{ last_page }}">{{ last_page }}</a></li>
+                  {% endif %}
+                {% endwith %}
+              {% endwith %}
+              
+              {% if orders.has_next %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ orders.next_page_number }}" aria-label="Suivante">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </nav>
+        
+    </div>
+    
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("searchInput");
+    const rows = document.querySelectorAll("tbody tr");
+
+    searchInput.addEventListener("input", function() {
+        const searchText = this.value.toLowerCase();
+        rows.forEach(function(row) {
+            const cells = row.querySelectorAll("td");
+            let found = false;
+            cells.forEach(function(cell) {
+                const text = cell.textContent.toLowerCase();
+                if (text.includes(searchText)) {
+                    found = true;
+                }
+            });
+            if (found) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    });
+});
+
+
+</script>
+{% endblock main-content %}
+

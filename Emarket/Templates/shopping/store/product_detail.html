@@ -1,0 +1,546 @@
+{% extends 'shopping/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<section class="section-content padding-y bg">
+    <div class="container">
+        
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <div class="card">
+        <div class="row no-gutters">
+            <aside class="col-md-6">
+                <article class="gallery-wrap"> 
+                    <div class="img-big-wrap">
+                        {% if single_product.image %}
+                                <a href="#"><img src="{{ single_product.image.url }}"></a>
+                            {% else %}
+                                <a href=""><img src="{% static 'images/aliment.jpeg' %}" class="img-sm"></a>
+                        {% endif %}
+                                        
+                    </div> <!-- img-big-wrap.// --> 
+                </article> <!-- gallery-wrap .end// -->
+            </aside>
+            <main class="col-md-6 border-left">
+                <form action="{% url 'add_to_cart' single_product.id %}" method="post">
+                    {% csrf_token %}
+                    <article class="content-body">
+                    
+                        <h2 class="title">{{ single_product.Nom }}</h2>
+                        <div class="rating-star">
+                            <span>
+                                <i class="fa fa-star{% if single_product.AverageReview < 0.5 %}-o{% elif single_product.AverageReview >= 0.5 and single_product.AverageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if single_product.AverageReview < 1.5 %}-o{% elif single_product.AverageReview >= 1.5 and single_product.AverageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if single_product.AverageReview < 2.5 %}-o{% elif single_product.AverageReview >= 2.5 and single_product.AverageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if single_product.AverageReview < 3.5 %}-o{% elif single_product.AverageReview >= 3.5 and single_product.AverageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <i class="fa fa-star{% if single_product.AverageReview < 4.5 %}-o{% elif single_product.AverageReview >= 4.5 and single_product.AverageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                <span>{{ single_product.CountReview }} Avis</span>
+                            </span>
+                        </div> 
+                        
+                        
+                        <div class="mb-3"> 
+                            <var class="price h4">$ {{ single_product.PrixUnitaire }}</var> 
+                        </div> 
+                        
+                        <p>{{ single_product.description }}</p>
+                    
+                        <hr>
+                         
+                        <hr>
+                        <!-- {% if single_product.stock <= 0  %}
+                            <h5 class="text-danger ">Out of Stock</h5>
+                        {% else %} -->
+                        <button type="submit" class="btn btn-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </button>
+                        {% endif %}
+                    </article> <!-- product-info-aside .// -->
+                </form>
+            </main> <!-- col.// -->
+        </div> <!-- row.// -->
+    </div> <!-- card.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+    <!-- <div id="chatbot" style="display:none;" class="table-responsive">
+        <div id="negotiation-messages" class="chat-container table-responsive"></div> <br> <br>
+        <div class="chat-input">
+            <input type="text" id="user-response" placeholder="Votre réponse..."/>
+            <button id="send-button">Envoyer</button>
+        </div>
+    </div> -->
+    
+    <br>
+    
+
+    <div class="row">
+        <div class="col-md-9">
+    
+            {% if messages %}
+            {% for msg in messages %}
+                <p id="alert-message" class="alert alert-{{ msg.tags }}" role="alert"> {{ msg }} </p>
+            {% endfor %}
+            {% endif %}
+            <br>
+            <form action="{% url 'submit_review' single_product.id %}" style="width: 60%;" method="post">
+                {% csrf_token %}
+                
+            <br>
+                <h5>Écrire une critique</h5>
+                <!-- {{ single_product.CountReview }} -->
+                <div>
+                    <label>Combien d'étoile donnez-vous à ce produit ?</label>
+                    <br>
+                    <div class="rate">
+                        <input type="radio" id="rating10" name="rating" value="5" required> <label for="rating10" title="5"></label>
+                        <input type="radio" id="rating9" name="rating" value="4.5" required> <label for="rating9" title="4.5" class="half"></label>
+                        <input type="radio" id="rating8" name="rating" value="4" required> <label for="rating8" title="4"></label>
+                        <input type="radio" id="rating7" name="rating" value="3.5" required> <label for="rating7" title="3.5" class="half"></label>
+                        <input type="radio" id="rating6" name="rating" value="3" required> <label for="rating6" title="3"></label>
+                        <input type="radio" id="rating5" name="rating" value="2.5" required> <label for="rating5" title="2.5" class="half"></label>
+                        <input type="radio" id="rating4" name="rating" value="2" required> <label for="rating4" title="2"></label>
+                        <input type="radio" id="rating3" name="rating" value="1.5" required><label for="rating3" title="1.5" class="half"></label>
+                        <input type="radio" id="rating2" name="rating" value="1" required> <label for="rating2" title="1"></label>
+                        <input type="radio" id="rating1" name="rating" value="0.5" required> <label for="rating1" title="0.5" class="half"></label>
+                    </div>
+                    <br>
+                    <!-- <label for="reviewtitle"></label> -->
+                    Titre du commentaire :
+                    <input class="form-control" id="reviewtitle" name="subject">
+                    <br>
+                    <!-- <label for="review"></label> -->
+                    commentaire :
+                    <textarea class="form-control" id="review" name="review" rows="4"></textarea>
+                </div>
+                <br>
+                {% if user.is_authenticated %}
+                    {% if orderproduct %}
+                        <button type="submit" class="btn btn-primary">Submit Review</button>
+                    {% else %}
+                        <p>Vous devez ajouter ce produit à votre panier avant de pouvoir soumettre un avis.</p>
+                    {% endif %}
+                {% else %}
+                 <p>Please log in to submit a review. <a href="{% url 'connexion' %}">Login Now</a> </p>
+                {% endif %}
+            </form>
+            <br>
+            <header class="section-heading">
+                <h3>Avis des clients </h3> 
+                <div class="rating-star">
+                    <span>
+                        <i class="fa fa-star{% if single_product.AverageReview < 0.5 %}-o{% elif single_product.AverageReview >= 0.5 and single_product.AverageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if single_product.AverageReview < 1.5 %}-o{% elif single_product.AverageReview >= 1.5 and single_product.AverageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if single_product.AverageReview < 2.5 %}-o{% elif single_product.AverageReview >= 2.5 and single_product.AverageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if single_product.AverageReview < 3.5 %}-o{% elif single_product.AverageReview >= 3.5 and single_product.AverageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <i class="fa fa-star{% if single_product.AverageReview < 4.5 %}-o{% elif single_product.AverageReview >= 4.5 and single_product.AverageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        <span>{{ single_product.CountReview }} Avis</span>
+                    </span>
+                </div> 
+            </header>
+            
+            {% for review in reviews %}
+            <article class="box mb-3" style="width: 60%;">
+                <div class="icontext w-100">
+                    <!-- <img src="{% static 'images/avatars/avatar1.jpg' %}" class="img-xs icon rounded-circle"> -->
+                    <div class="text">
+                    <span class="date text-muted float-md-right">{{ review.date }}</span>
+                    <h6 class="mb-1">{{ review.subject }}</h6>
+                    <div class="rating-star">
+                        <span class="rating">
+                            <i class="fa fa-star{% if review.rating < 0.5 %}-o{% elif review.rating >= 0.5 and review.rating < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if review.rating < 1.5 %}-o{% elif review.rating >= 1.5 and review.rating < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if review.rating < 2.5 %}-o{% elif review.rating >= 2.5 and review.rating < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if review.rating < 3.5 %}-o{% elif review.rating >= 3.5 and review.rating < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                            <i class="fa fa-star{% if review.rating < 4.5 %}-o{% elif review.rating >= 4.5 and review.rating < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+                        </span>
+                    </div> 
+                    <span class="author mb-4">{{ review.user.prenoms }}{{ review.user.nom }}</span>
+                    <p>{{ review.review }}</p>
+                    </div>
+                </div> <!-- icontext.// -->
+            </article> <!-- box.// -->
+            {% endfor %}
+    
+        </div> <!-- col.// -->
+    </div>
+
+    <div class="col-md-12">
+
+        <h2>Produits recommandés</h2>
+        <small><i>Plus de {{recommended_products_count}} similaire à ce produit</i></small>
+        <div class="row">
+            {% for product in recommended_products %}
+                <div class="col-md-2">
+                    <figure class="card card-product-grid" style="height: 90% !important;">
+                        <div class="img-wrap" style="height: 100% !important;"> 
+                            {% if product.image %}
+                                <a href="{{ product.get_url }}"><img src="{{product.image.url}}"></a>
+                            {% else %}
+                                <a href="{{ product.get_url }}"><img src="{% static 'images/aliment.jpeg' %}"></a>
+                            {% endif %}
+                        </div>
+                        <figcaption class="info-wrap">
+                            <div class="fix-height">
+                                <a href="{{ product.get_url }}" class="title">{{product.Nom}}</a>
+                                <div class="">
+                                    <span class="price">{{product.PrixUnitaire}}</span>
+                                    <header class="">
+                                        <div class="rating-star">
+                                            <span>
+                                                <i class="fa fa-star{% if product.AverageReview < 0.5 %}-o{% elif product.AverageReview >= 0.5 and product.AverageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                                <i class="fa fa-star{% if product.AverageReview < 1.5 %}-o{% elif product.AverageReview >= 1.5 and product.AverageReview < 2 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                                <i class="fa fa-star{% if product.AverageReview < 2.5 %}-o{% elif product.AverageReview >= 2.5 and product.AverageReview < 3 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                                <i class="fa fa-star{% if product.AverageReview < 3.5 %}-o{% elif product.AverageReview >= 3.5 and product.AverageReview < 4 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                                <i class="fa fa-star{% if product.AverageReview < 4.5 %}-o{% elif product.AverageReview >= 4.5 and product.AverageReview < 5 %}-half-o {% endif %}" aria-hidden="true"></i>
+                                            </span>
+                                        </div> 
+                                    </header>
+                                </div>
+                            </div>
+                        </figcaption>
+                    </figure>
+                </div> 
+            {% endfor %}
+        </div>
+    </div>
+    
+    </div><!-- container //  -->
+    </section>
+    <style>
+        #chatbot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 39%;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            max-height: 400px;
+        }
+    
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 300px;
+            padding-bottom: 10px;
+        }
+    
+        .chat-message {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            max-width: 80%;
+            display: inline-block;
+        }
+    
+        .bot-message {
+            background-color: #f1f1f1;
+            align-self: flex-start;
+        }
+    
+        .user-message {
+            background-color: #007bff;
+            /*margin-left: 23%;
+            margin-top: 13%;*/
+            color: white;
+            align-self: flex-end;
+        }
+    
+        #user-response {
+            width: calc(100% - 90px);
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    
+        #send-button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+    
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+    
+        .typing-indicator {
+            display: none;
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+            align-self: flex-start;
+        }
+        
+        .store-link {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    
+        .store-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    
+    <div id="chatbot" style="display:none;">
+        <div id="negotiation-messages" class="chat-container"></div><br><br>
+        <div class="chat-input">
+            <input type="text" id="user-response" placeholder="Votre réponse..."/>
+            <button id="send-button">Envoyer</button>
+        </div>
+    </div>
+    
+    <!-- <script>
+        const initialPrice = parseFloat("{{ single_product.PrixUnitaire }}");
+        let currentPrice = initialPrice;
+        const reductions = [0.05, 0.08, 0.10];
+        let reductionIndex = 0;
+    
+        function showChatbot() {
+            document.getElementById('chatbot').style.display = 'block';
+            addChatMessage("Hello! je suis Harry, il parait que ce produit vous intéresse ?", 'bot-message');
+        }
+    
+        function addChatMessage(message, className) {
+            const messagesContainer = document.getElementById('negotiation-messages');
+            const messageElement = document.createElement('p');
+            messageElement.className = `chat-message ${className}`;
+            messageElement.innerHTML = message; // Use innerHTML to support HTML content
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    
+        function addTypingIndicator() {
+            const messagesContainer = document.getElementById('negotiation-messages');
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'chat-message typing-indicator';
+            typingIndicator.id = 'typing-indicator';
+            typingIndicator.textContent = '...';
+            messagesContainer.appendChild(typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+    
+        document.getElementById('send-button').onclick = function() {
+            const userResponse = document.getElementById('user-response').value.toLowerCase();
+            addChatMessage(userResponse, 'user-message');
+            document.getElementById('user-response').value = '';
+    
+            addTypingIndicator();
+            setTimeout(() => {
+                removeTypingIndicator();
+                processResponse(userResponse);
+            }, 2000);
+        };
+    
+        function processResponse(userResponse) {
+            if (userResponse.includes('oui') || userResponse.includes('d\'accord') || userResponse.includes('ok')) {
+                if (reductionIndex === 0) {
+                    addChatMessage("Cool je suis heureux de savoir que ce produit vous intéresse. Nous pouvons discuter du prix pour trouver un accord.", 'bot-message');
+                    setTimeout(() => {
+                        const discountedPrice = calculatePrice(0.05);
+                        addChatMessage(`Qu'en pensez-vous d'une réduction de 5% du prix initial (${initialPrice.toFixed(2)} FCFA) ce qui donne ${discountedPrice.toFixed(2)} FCFA ? Êtes-vous d'accord ?`, 'bot-message');
+                    }, 2000);
+                    reductionIndex++;
+                } else if (reductionIndex === 1) {
+                    currentPrice = calculatePrice(0.05);
+                    addChatMessage(`Super ! Vous pouvez continuer votre achat avec le prix conclu ${currentPrice.toFixed(2)} FCFA`, 'bot-message');
+                    setTimeout(() => {
+                        addChatMessage('Un instant...', 'bot-message');
+                        setTimeout(() => {
+                            const productId = "{{ single_product.id }}";
+                            window.location.href = "{% url 'add_to_cart_neg' 0 %}".replace("0", productId) + "?price=" + currentPrice.toFixed(2);
+                        }, 6000);
+                    }, 2000);
+                    return; // Stop further processing
+                } else if (reductionIndex === 2) {
+                    currentPrice = calculatePrice(0.08);
+                    addChatMessage(`Super ! Vous pouvez continuer votre achat avec le prix conclu ${currentPrice.toFixed(2)} FCFA`, 'bot-message');
+                    setTimeout(() => {
+                        addChatMessage('Un instant...', 'bot-message');
+                        setTimeout(() => {
+                            const productId = "{{ single_product.id }}";
+                            window.location.href = "{% url 'add_to_cart_neg' 0 %}".replace("0", productId) + "?price=" + currentPrice.toFixed(2);
+                        }, 6000);
+                    }, 2000);
+                    return; // Stop further processing
+                }
+            } else if (userResponse.includes('non')) {
+                if (reductionIndex === 0) {
+                    setTimeout(() => {
+                        addChatMessage(`Continuer votre recherche en cliquant sur le bouton <a href="/boutique/" class="store-link">Store</a>`, 'bot-message');
+                    }, 2000);
+                } else if (reductionIndex < reductions.length) {
+                    currentPrice = calculatePrice(reductions[reductionIndex]);
+                    if (reductionIndex === 1) {
+                        setTimeout(() => {
+                            addChatMessage(`OK, êtes-vous d'accord pour une réduction de 8% du prix initial (${initialPrice.toFixed(2)} FCFA) ce qui donne ${currentPrice.toFixed(2)} FCFA ?`, 'bot-message');
+                        }, 4000);
+                    } else if (reductionIndex === 2) {
+                        setTimeout(() => {
+                            addChatMessage(`Humm!! je vous voir venir, OK je vous fais une réduction finale de 10% du prix initial (${initialPrice.toFixed(2)} FCFA) ce qui donne ${currentPrice.toFixed(2)} FCFA ?`, 'bot-message');
+                        }, 4000);
+                    }
+                    reductionIndex++;
+                } else {
+                    setTimeout(() => {
+                        addChatMessage("Je suis désolé, je ne peux pas réduire le prix davantage. Voulez-vous continuer l'achat avec la dernière réduction effectuée ?", 'bot-message');
+                    }, 4000);
+                    reductionIndex = 0;
+                }
+            }
+        }
+    
+        function calculatePrice(discount) {
+            return initialPrice * (1 - discount);
+        }
+    
+        showChatbot();
+    </script>
+     -->
+    <script>
+        const productName = "{{ single_product.Nom }}"; // Assuming the product name is available in the context
+        const initialPrice = parseFloat("{{ single_product.PrixUnitaire }}");
+        let currentPrice = initialPrice;
+        const reductions = [0.05, 0.08, 0.10];
+        let reductionIndex = 0;
+    
+        function showChatbot() {
+            document.getElementById('chatbot').style.display = 'block';
+            addChatMessage(`Hello! je suis Harry, il parait que le produit <h6>${productName}</h6> vous intéresse au prix initial de ${initialPrice.toFixed(2)} FCFA ?`, 'bot-message');
+        }
+    
+        function addChatMessage(message, className) {
+            const messagesContainer = document.getElementById('negotiation-messages');
+            const messageElement = document.createElement('p');
+            messageElement.className = `chat-message ${className}`;
+            messageElement.innerHTML = message; // Use innerHTML to support HTML content
+            messagesContainer.appendChild(messageElement);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    
+        function addTypingIndicator() {
+            const messagesContainer = document.getElementById('negotiation-messages');
+            const typingIndicator = document.createElement('div');
+            typingIndicator.className = 'chat-message typing-indicator';
+            typingIndicator.id = 'typing-indicator';
+            typingIndicator.textContent = '...';
+            messagesContainer.appendChild(typingIndicator);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+    
+        document.getElementById('send-button').onclick = function() {
+            const userResponse = document.getElementById('user-response').value.toLowerCase();
+            addChatMessage(userResponse, 'user-message');
+            document.getElementById('user-response').value = '';
+    
+            addTypingIndicator();
+            setTimeout(() => {
+                removeTypingIndicator();
+                processResponse(userResponse);
+            }, 2000);
+        };
+    
+        function processResponse(userResponse) {
+            if (userResponse.includes('oui') || userResponse.includes('d\'accord') || userResponse.includes('ok')) {
+                if (reductionIndex === 0) {
+                    addChatMessage("Cool je suis heureux de savoir que ce produit vous intéresse. Nous pouvons discuter du prix pour trouver un accord.", 'bot-message');
+                    setTimeout(() => {
+                        const discountedPrice = calculatePrice(0.05);
+                        addChatMessage(`Qu'en pensez-vous d'une réduction de 5% du prix initial (${initialPrice.toFixed(2)} FCFA) ce qui donne ${discountedPrice.toFixed(2)} FCFA ? Êtes-vous d'accord ?`, 'bot-message');
+                    }, 2000);
+                    reductionIndex++;
+                } else if (reductionIndex === 1) {
+                    currentPrice = calculatePrice(0.05);
+                    addChatMessage(`Super ! Vous pouvez continuer votre achat avec le prix conclu ${currentPrice.toFixed(2)} FCFA`, 'bot-message');
+                    setTimeout(() => {
+                        addChatMessage('Un instant...', 'bot-message');
+                        setTimeout(() => {
+                            const productId = "{{ single_product.id }}";
+                            window.location.href = "{% url 'add_to_cart_neg' 0 %}".replace("0", productId) + "?price=" + currentPrice.toFixed(2);
+                        }, 6000);
+                    }, 2000);
+                    return; // Stop further processing
+                } else if (reductionIndex === 2) {
+                    currentPrice = calculatePrice(0.08);
+                    addChatMessage(`Super ! Vous pouvez continuer votre achat avec le prix conclu ${currentPrice.toFixed(2)} FCFA`, 'bot-message');
+                    setTimeout(() => {
+                        addChatMessage('Un instant...', 'bot-message');
+                        setTimeout(() => {
+                            const productId = "{{ single_product.id }}";
+                            window.location.href = "{% url 'add_to_cart_neg' 0 %}".replace("0", productId) + "?price=" + currentPrice.toFixed(2);
+                        }, 6000);
+                    }, 2000);
+                    return; // Stop further processing
+                } else if (reductionIndex === 3) {
+                    currentPrice = calculatePrice(0.10);
+                    addChatMessage(`Super ! Vous pouvez continuer votre achat avec le prix conclu ${currentPrice.toFixed(2)} FCFA`, 'bot-message');
+                    setTimeout(() => {
+                        addChatMessage('Un instant...', 'bot-message');
+                        setTimeout(() => {
+                            const productId = "{{ single_product.id }}";
+                            window.location.href = "{% url 'add_to_cart_neg' 0 %}".replace("0", productId) + "?price=" + currentPrice.toFixed(2);
+                        }, 6000);
+                    }, 2000);
+                    return; // Stop further processing
+                }
+            } else if (userResponse.includes('non')) {
+                if (reductionIndex === 0) {
+                    setTimeout(() => {
+                        addChatMessage(`Continuer votre recherche en cliquant sur le bouton <a href="/boutique/" class="store-link">Store</a>`, 'bot-message');
+                    }, 2000);
+                } else if (reductionIndex === 1) {
+                    setTimeout(() => {
+                        const discountedPrice = calculatePrice(0.08);
+                        addChatMessage(`OK, êtes-vous d'accord pour une réduction de 8% du prix initial (${initialPrice.toFixed(2)} FCFA) ce qui donne ${discountedPrice.toFixed(2)} FCFA ?`, 'bot-message');
+                    }, 4000);
+                    reductionIndex++;
+                } else if (reductionIndex === 2) {
+                    setTimeout(() => {
+                        const discountedPrice = calculatePrice(0.10);
+                        addChatMessage(`Humm!! je vous voir venir, OK je vous fais une réduction finale de 10% du prix initial (${initialPrice.toFixed(2)} FCFA) ce qui donne ${discountedPrice.toFixed(2)} FCFA ?`, 'bot-message');
+                    }, 4000);
+                    reductionIndex++;
+                } else {
+                    setTimeout(() => {
+                        addChatMessage("Je suis désolé, je ne peux pas réduire le prix davantage. Voulez-vous continuer l'achat avec la dernière réduction effectuée ?", 'bot-message');
+                    }, 4000);
+                    reductionIndex = 0;
+                }
+            }
+        }
+    
+        function calculatePrice(discount) {
+            return initialPrice * (1 - discount);
+        }
+    
+        showChatbot();
+    </script>
+    
+{% endblock %}
