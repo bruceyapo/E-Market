@@ -1,11 +1,13 @@
 
 
+import json
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render,redirect
 from django.views.decorators.http import require_POST
 import requests
 
+from boutique.models import Stock
 from commande.models import Order, OrderProduct
 from myapp.models import Vente
 from panier.models import Cart, CartItem
@@ -59,8 +61,7 @@ def accueiladmin(request):
     total_ventes = Vente.objects.all()
     nombre_total_vente = total_ventes.count()
     # Calculer la date et l'heure il y a 24 heures
-    twenty_four_hours_ago = now - timedelta(hours=24)
-
+    twenty_four_hours_ago = now - timedelta(hours=720)
     # Récupérer les ventes réalisées en moins de 24 heures
     ventes_par_jour = Vente.objects.filter(DateVente__gte=twenty_four_hours_ago)
     nombre_ventes_par_jour = ventes_par_jour.count()
@@ -120,9 +121,17 @@ def accueilGestionnaireStock(request):
     utilisateur = get_object_or_404(Utilisateur, id=request.user.id)
     # Utiliser la clé étrangère pour récupérer l'administrateur associé
     gestionnaireStock = get_object_or_404(GesteionnaireStock, IdUtilisateur=utilisateur)
+    stocks = Stock.objects.all().select_related('IdProduit', 'IdProduit__IdCategorie').order_by('QuantiteStock')
+    # Préparer les données pour le graphique
+    
+    stocks_product = Stock.objects.filter(QuantiteStock__lt=250).select_related('IdProduit', 'IdProduit__IdCategorie').order_by('-QuantiteStock')
+    product_names = [stock.IdProduit.Nom for stock in stocks_product]
+    stock_quantities = [stock.QuantiteStock for stock in stocks_product]
     context = {
         'utilisateur': utilisateur,
         'gestionnaireStock': gestionnaireStock,
+        'product_names': product_names,
+        'stock_quantities': stock_quantities,
     }
     messages.success(request,f"Heureux de vous revoir M/Mme/Mlle {gestionnaireStock.prenoms} {gestionnaireStock.nom}")
     return render(request, 'app/GestionnaireStock/accueilGesteionnaireStock.html',locals())

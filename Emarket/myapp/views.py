@@ -1,3 +1,4 @@
+import json
 import pickle
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
@@ -663,9 +664,9 @@ def visuels(request):
         
         now = timezone.now()
         # total_ventes = Vente.objects.all()
-        total_ventes = ventes_for_date.count()
+        total_ventes = Listeventes.count()
         # Calculer la date et l'heure il y a 24 heures
-        twenty_four_hours_ago = now - timedelta(hours=24)
+        twenty_four_hours_ago = now - timedelta(hours=720)
 
         # Récupérer les ventes réalisées en moins de 24 heures
         ventes_par_jour = Vente.objects.filter(DateVente__gte=twenty_four_hours_ago)
@@ -723,7 +724,7 @@ def visuels(request):
         
         now = timezone.now()
         # Calculer la date et l'heure il y a 24 heures
-        twenty_four_hours_ago = now - timedelta(hours=24)
+        twenty_four_hours_ago = now - timedelta(hours=720)
 
         # Récupérer les ventes réalisées en moins de 24 heures
         ventes_par_jour = Vente.objects.filter(DateVente__gte=twenty_four_hours_ago)
@@ -916,6 +917,7 @@ def handle_uploaded_file(file, user_id):
             MontantTotal=row['Prix'],
             DateVente=row['Date']
         )
+
 @login_required(login_url='connexion')
 def ventes(request):
     user = request.user.id
@@ -1270,16 +1272,32 @@ def get_product_details(request, product_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+# def liste_stock(request):
+#     stocks = Stock.objects.all().select_related('IdProduit', 'IdProduit__IdCategorie').order_by('QuantiteStock')
+#     notifications = Notification.objects.filter(est_lu=False)
+#     paginator = Paginator(stocks, 25)  # Affiche 25 ventes par page
+
+#     page_number = request.GET.get('page')
+#     stocks = paginator.get_page(page_number)
+#     return render(request, 'app/GestionnaireStock/liste_stock.html', {'stocks': stocks, 'notifications':notifications})
+
 def liste_stock(request):
     stocks = Stock.objects.all().select_related('IdProduit', 'IdProduit__IdCategorie').order_by('QuantiteStock')
     notifications = Notification.objects.filter(est_lu=False)
-    paginator = Paginator(stocks, 25)  # Affiche 25 ventes par page
+    paginator = Paginator(stocks, 25)  # Affiche 25 stocks par page
 
     page_number = request.GET.get('page')
-    stocks = paginator.get_page(page_number)
-    return render(request, 'app/GestionnaireStock/liste_stock.html', {'stocks': stocks, 'notifications':notifications})
+    stocks_page = paginator.get_page(page_number)
+    
+    
+    
+    context = {
+        'stocks': stocks_page,
+        'notifications': notifications,
+        
+    }
 
-
+    return render(request, 'app/GestionnaireStock/liste_stock.html', context)
 
 @require_POST
 def mark_notification_as_read(request, notification_id):

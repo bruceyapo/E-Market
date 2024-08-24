@@ -74,28 +74,28 @@ def store(request, category_slug=None):
 
 
 # def chatbot_negotiation(request, product_id):
-#     if request.method == 'POST':
-#         product = get_object_or_404(Negotiation, id=product_id)
-#         user_response = request.POST.get('user_response')
+    if request.method == 'POST':
+        product = get_object_or_404(Negotiation, id=product_id)
+        user_response = request.POST.get('user_response')
 
-#         # Logique de négociation
-#         reduction_steps = [0.05, 0.10, 0.08, 0.12, 0.15]
-#         initial_price = product.PrixUnitaire
-#         current_step = int(request.POST.get('current_step', 0))
+        # Logique de négociation
+        reduction_steps = [0.05, 0.10, 0.08, 0.12, 0.15]
+        initial_price = product.PrixUnitaire
+        current_step = int(request.POST.get('current_step', 0))
 
-#         if user_response == 'agree':
-#             product.PrixNegocie = initial_price * (1 - reduction_steps[current_step])
-#             product.save()
-#             return JsonResponse({'status': 'agreed', 'negotiated_price': product.PrixNegocie})
+        if user_response == 'agree':
+            product.PrixNegocie = initial_price * (1 - reduction_steps[current_step])
+            product.save()
+            return JsonResponse({'status': 'agreed', 'negotiated_price': product.PrixNegocie})
         
-#         if current_step < len(reduction_steps) - 1:
-#             next_price = initial_price * (1 - reduction_steps[current_step])
-#             current_step += 1
-#             return JsonResponse({'status': 'continue', 'next_price': next_price, 'current_step': current_step})
-#         else:
-#             return JsonResponse({'status': 'failed', 'message': 'Négociation échouée'})
+        if current_step < len(reduction_steps) - 1:
+            next_price = initial_price * (1 - reduction_steps[current_step])
+            current_step += 1
+            return JsonResponse({'status': 'continue', 'next_price': next_price, 'current_step': current_step})
+        else:
+            return JsonResponse({'status': 'failed', 'message': 'Négociation échouée'})
 
-#     return JsonResponse({'error': 'Invalid request method'})
+    return JsonResponse({'error': 'Invalid request method'})
 
 import joblib
 # Charger le modèle de recommandation sauvegardé
